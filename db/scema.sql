@@ -1,0 +1,55 @@
+-- -- Create the main database (optional if already made)
+-- CREATE DATABASE IF NOT EXISTS sneaker_store;
+-- USE sneaker_store;
+
+-- -- Users table
+-- CREATE TABLE IF NOT EXISTS users (
+--   id INT AUTO_INCREMENT PRIMARY KEY,
+--   name VARCHAR(100) NOT NULL,
+--   email VARCHAR(100) UNIQUE NOT NULL,
+--   password_hash VARCHAR(255) NOT NULL,
+--   role ENUM('user','admin') DEFAULT 'user'
+-- );
+
+-- -- Products table
+-- CREATE TABLE IF NOT EXISTS products (
+--   id INT AUTO_INCREMENT PRIMARY KEY,
+--   name VARCHAR(100) NOT NULL,
+--   description TEXT,
+--   price DECIMAL(10,2) NOT NULL,
+--   quantity INT DEFAULT 0,
+--   image_url VARCHAR(255)
+-- );
+
+-- -- Discounts table
+-- CREATE TABLE IF NOT EXISTS discounts (
+--   id INT AUTO_INCREMENT PRIMARY KEY,
+--   code VARCHAR(50) UNIQUE,
+--   type ENUM('percent','flat') NOT NULL,
+--   amount DECIMAL(10,2) NOT NULL,
+--   active BOOLEAN DEFAULT TRUE
+-- );
+
+-- -- Orders table
+-- CREATE TABLE IF NOT EXISTS orders (
+--   id INT AUTO_INCREMENT PRIMARY KEY,
+--   user_id INT,
+--   subtotal DECIMAL(10,2),
+--   discount DECIMAL(10,2),
+--   tax DECIMAL(10,2),
+--   total DECIMAL(10,2),
+--   date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--   status ENUM('pending','completed','cancelled') DEFAULT 'pending',
+--   FOREIGN KEY (user_id) REFERENCES users(id)
+-- );
+
+-- -- Order Items table
+-- CREATE TABLE IF NOT EXISTS order_items (
+--   id INT AUTO_INCREMENT PRIMARY KEY,
+--   order_id INT,
+--   product_id INT,
+--   quantity INT,
+--   unit_price DECIMAL(10,2),
+--   FOREIGN KEY (order_id) REFERENCES orders(id),
+--   FOREIGN KEY (product_id) REFERENCES products(id)
+-- );
