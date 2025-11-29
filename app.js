@@ -88,9 +88,10 @@ app.post('/api/login', (req, res) => {
 });
 
 // Fallback route for testing
-app.get('*', (req, res) => {
-  res.send('Sneaker Store API is running 🚀');
+app.all('/*', (req, res) => {
+  res.status(404).send('Route not found');
 });
+
 
 // Start server
 app.listen(PORT, () => {
