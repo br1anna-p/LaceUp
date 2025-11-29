@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Cart - LaceUp</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="logo">LaceUp</div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/cart.html">Cart (<span id="cart-count">0</span>)</a>
+            <a href="/login.html">Login</a>
+            <a href="/signup.html">Sign Up</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Your Shopping Cart</h1>
+
+        <!-- CART ITEMS -->
+        <div id="cart-items"></div>
+
+        <!-- TOTALS BOX -->
+        <div class="cart-total-box">
+            <p>Subtotal: $<span id="subtotal">0.00</span></p>
+            <p>Tax (8.25%): $<span id="tax">0.00</span></p>
+            <p><strong>Total: $<span id="total">0.00</span></strong></p>
+
+            <button class="btn" id="checkout-btn">Checkout</button>
+        </div>
+    </div>
+
+    <script src="/script.js"></script>
+</body>
+</html>
