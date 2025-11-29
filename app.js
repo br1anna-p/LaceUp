@@ -88,7 +88,7 @@ app.post('/api/login', (req, res) => {
 });
 
 // Fallback route for testing
-app.all('/*', (req, res) => {
+app.use((req, res) => {
   res.status(404).send('Route not found');
 });
 
