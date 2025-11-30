@@ -3,38 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Cart - LaceUp</title>
-  <link rel="stylesheet" href="/style.css">
+  <title>Cart - LaceUp</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <!-- NAVBAR -->
-    <div class="navbar">
-        <div class="logo">LaceUp</div>
-        <div class="nav-links">
-            <a href="/">Home</a>
-            <a href="/cart.html">Cart (<span id="cart-count">0</span>)</a>
-            <a href="/login.html">Login</a>
-            <a href="/signup.html">Sign Up</a>
-        </div>
+  <div class="navbar">
+    <div class="logo">LaceUp</div>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/cart.html">Cart <span id="cart-count">0</span></a>
+      <a href="/login.html">Login</a>
+      <a href="/signup.html">Sign Up</a>
     </div>
+  </div>
 
-    <div class="container">
-        <h1>Your Shopping Cart</h1>
+  <div class="container">
+    <h1>Your Cart</h1>
+    <div id="cart-items"></div>
+    <div id="cart-summary"></div>
+  </div>
 
-        <!-- CART ITEMS -->
-        <div id="cart-items"></div>
+  <script src="script.js"></script>
+  <script>
+    function renderCart() {
+      const cart = getCart();
+      const container = document.getElementById('cart-items');
+      container.innerHTML = '';
 
-        <!-- TOTALS BOX -->
-        <div class="cart-total-box">
-            <p>Subtotal: $<span id="subtotal">0.00</span></p>
-            <p>Tax (8.25%): $<span id="tax">0.00</span></p>
-            <p><strong>Total: $<span id="total">0.00</span></strong></p>
+      if (cart.length === 0) {
+        container.innerHTML = '<p>Your cart is empty.</p>';
+        document.getElementById('cart-summary').innerHTML = '';
+        return;
+      }
 
-            <button class="btn" id="checkout-btn">Checkout</button>
-        </div>
-    </div>
+      cart.forEach(item => {
+        container.innerHTML += `
+          <div class="cart-item">
+            <img src="${item.image_url}" alt="${item.name}" width="100">
+            <div>${item.name}</div>
+            <div>$${item.price} x ${item.quantity}</div>
+            <button onclick="removeFromCart(${item.id})">Remove</button>
+          </div>
+        `;
+      });
 
-    <script src="/script.js"></script>
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const tax = +(subtotal * 0.0825).toFixed(2);
+      const total = +(subtotal + tax).toFixed(2);
+
+      document.getElementById('cart-summary').innerHTML = `
+        <p>Subtotal: $${subtotal.toFixed(2)}</p>
+        <p>Tax: $${tax}</p>
+        <p><strong>Total: $${total}</strong></p>
+      `;
+    }
+
+    function removeFromCart(id) {
+      let cart = getCart();
+      cart = cart.filter(item => item.id !== id);
+      saveCart(cart);
+      renderCart();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateCartCount();
+      renderCart();
+    });
+  </script>
 </body>
 </html>
