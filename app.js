@@ -1,30 +1,32 @@
 // app.js
-require('dotenv').config(); // MUST be first
-
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const path = require('path');
-const db = require('./db/connection');
+const db = require('./db/connection'); // MySQL connection
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// =====================
 // Middleware
+// =====================
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public')); // serve HTML, CSS, JS
 
 // =====================
 // ROUTES
 // =====================
 
-// Home
+// Home page
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(__dirname + '/public/index.html');
 });
 
-// Get all products
+// =====================
+// GET PRODUCTS (API)
+// =====================
 app.get('/api/products', (req, res) => {
   const query = 'SELECT * FROM products';
   db.query(query, (err, results) => {
@@ -33,19 +35,28 @@ app.get('/api/products', (req, res) => {
   });
 });
 
-// User registration
+// =====================
+// USER REGISTRATION
+// =====================
 app.post('/api/register', (req, res) => {
   const { F_name, L_name, email, password, role } = req.body;
+
   if (!F_name || !L_name || !email || !password)
     return res.status(400).json({ error: 'Please fill all fields' });
 
   db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
     if (err) return res.status(500).json({ error: 'Database error' });
-    if (results.length > 0) return res.status(400).json({ error: 'Email already registered' });
+    if (results.length > 0)
+      return res.status(400).json({ error: 'Email already registered' });
 
     const hashedPassword = bcrypt.hashSync(password, 10);
+
+    const insertQuery = `
+      INSERT INTO users (F_name, L_name, email, password_hash, role)
+      VALUES (?, ?, ?, ?, ?)
+    `;
     db.query(
-      'INSERT INTO users (F_name, L_name, email, password_hash, role) VALUES (?, ?, ?, ?, ?)',
+      insertQuery,
       [F_name, L_name, email, hashedPassword, role || 'customer'],
       (err, result) => {
         if (err) return res.status(500).json({ error: 'Error creating user' });
@@ -55,7 +66,9 @@ app.post('/api/register', (req, res) => {
   });
 });
 
-// User login
+// =====================
+// USER LOGIN
+// =====================
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
   if (!email || !password)
@@ -63,10 +76,12 @@ app.post('/api/login', (req, res) => {
 
   db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
     if (err) return res.status(500).json({ error: 'Database error' });
-    if (results.length === 0) return res.status(401).json({ error: 'Invalid email or password' });
+    if (results.length === 0)
+      return res.status(401).json({ error: 'Invalid email or password' });
 
     const user = results[0];
     const isMatch = bcrypt.compareSync(password, user.password_hash);
+
     if (!isMatch) return res.status(401).json({ error: 'Invalid email or password' });
 
     const token = jwt.sign(
@@ -78,17 +93,27 @@ app.post('/api/login', (req, res) => {
     res.json({
       message: 'Login successful!',
       token,
-      user: { id: user.id, F_name: user.F_name, L_name: user.L_name, email: user.email, role: user.role },
+      user: {
+        id: user.id,
+        F_name: user.F_name,
+        L_name: user.L_name,
+        email: user.email,
+        role: user.role,
+      },
     });
   });
 });
 
-// 404 fallback
+// =====================
+// 404 ROUTE
+// =====================
 app.use((req, res) => {
   res.status(404).send('Route not found');
 });
 
-// Start server
+// =====================
+// START SERVER
+// =====================
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
