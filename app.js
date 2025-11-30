@@ -1,50 +1,117 @@
-import express from "express";
-import path from "path";
-import cors from "cors";
-import { fileURLToPath } from "url";
-
-// Database connection
-import db from "./database/connection.js";
-
-// Route files
-import authRoutes from "./routes/authRoutes.js";
-import productRoutes from "./routes/productRoutes.js";
-import sizeRoutes from "./routes/sizeRoutes.js";
-import discountRoutes from "./routes/discountRoutes.js";
-import orderRoutes from "./routes/orderRoutes.js";
-import orderItemRoutes from "./routes/orderItemRoutes.js";
+// app.js
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const db = require('./database/connection'); // CommonJS import
+require('dotenv').config();
 
 const app = express();
-
-// Needed to fix __dirname in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public')); // serve HTML, CSS, JS
 
-// Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/products", productRoutes);
-app.use("/api/sizes", sizeRoutes);
-app.use("/api/discounts", discountRoutes);
-app.use("/api/orders", orderRoutes);
-app.use("/api/order-items", orderItemRoutes);
+// =====================
+// ROUTES
+// =====================
 
-// Simple health check route
-app.get("/api/health", (req, res) => {
-  res.json({ status: "ok" });
+// Home test route
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
 });
 
-// 404 fallback (IMPORTANT: do NOT use `/*`)
+// =====================
+// GET PRODUCTS (API)
+// =====================
+app.get('/api/products', (req, res) => {
+  const query = 'SELECT * FROM products';
+  db.query(query, (err, results) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    res.json(results);
+  });
+});
+
+// =====================
+// USER REGISTRATION
+// =====================
+app.post('/api/register', (req, res) => {
+  const { F_name, L_name, email, password, role } = req.body;
+
+  if (!F_name || !L_name || !email || !password)
+    return res.status(400).json({ error: 'Please fill all fields' });
+
+  db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    if (results.length > 0)
+      return res.status(400).json({ error: 'Email already registered' });
+
+    const hashedPassword = bcrypt.hashSync(password, 10);
+
+    const insertQuery = `
+      INSERT INTO users (F_name, L_name, email, password_hash, role)
+      VALUES (?, ?, ?, ?, ?)
+    `;
+    db.query(
+      insertQuery,
+      [F_name, L_name, email, hashedPassword, role || 'customer'],
+      (err, result) => {
+        if (err) return res.status(500).json({ error: 'Error creating user' });
+        res.json({ message: 'User registered successfully!', userId: result.insertId });
+      }
+    );
+  });
+});
+
+// =====================
+// USER LOGIN
+// =====================
+app.post('/api/login', (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password)
+    return res.status(400).json({ error: 'Please provide email and password' });
+
+  db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    if (results.length === 0)
+      return res.status(401).json({ error: 'Invalid email or password' });
+
+    const user = results[0];
+    const isMatch = bcrypt.compareSync(password, user.password_hash);
+
+    if (!isMatch) return res.status(401).json({ error: 'Invalid email or password' });
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET || 'secretkey',
+      { expiresIn: '1h' }
+    );
+
+    res.json({
+      message: 'Login successful!',
+      token,
+      user: {
+        id: user.id,
+        F_name: user.F_name,
+        L_name: user.L_name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  });
+});
+
+// =====================
+// 404 ROUTE
+// =====================
 app.use((req, res) => {
-  res.status(404).json({ error: "Route not found" });
+  res.status(404).send('Route not found');
 });
 
-// Start server
-const PORT = process.env.PORT || 3000;
+// =====================
+// START SERVER
+// =====================
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
