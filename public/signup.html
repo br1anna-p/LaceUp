@@ -1,63 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign Up - LaceUp</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="navbar">
-    <div class="logo">LaceUp</div>
-    <div class="nav-links">
-      <a href="/">Home</a>
-      <a href="/cart.html">Cart <span id="cart-count">0</span></a>
-      <a href="/login.html">Login</a>
-      <a href="/signup.html">Sign Up</a>
-    </div>
-  </div>
 
-  <div class="container">
-    <h1>Sign Up</h1>
-    <form id="signup-form">
-      <input type="text" id="F_name" placeholder="First Name" required>
-      <input type="text" id="L_name" placeholder="Last Name" required>
-      <input type="email" id="email" placeholder="Email" required>
-      <input type="password" id="password" placeholder="Password" required>
-      <button type="submit">Sign Up</button>
-    </form>
-  </div>
+<h1>Create Account</h1>
 
-  <script src="script.js"></script>
-  <script>
-    document.getElementById('signup-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const F_name = document.getElementById('F_name').value;
-      const L_name = document.getElementById('L_name').value;
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+<form id="signup-form">
+  <input type="text" id="fname" placeholder="First Name" required />
+  <input type="text" id="lname" placeholder="Last Name" required />
+  <input type="email" id="email" placeholder="Email" required />
+  <input type="password" id="password" placeholder="Password" required />
+  <button type="submit">Sign Up</button>
+</form>
 
-      try {
-        const res = await fetch('/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ F_name, L_name, email, password })
-        });
-        const data = await res.json();
-
-        if (res.error) {
-          alert(data.error || 'Error creating account');
-        } else {
-          alert('Account created successfully!');
-          window.location.href = '/login.html';
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Error signing up');
-      }
-    });
-
-    document.addEventListener('DOMContentLoaded', updateCartCount);
-  </script>
+<script src="signup.js"></script>
 </body>
 </html>

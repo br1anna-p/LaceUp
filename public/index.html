@@ -1,53 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LaceUp Sneaker Store</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>LaceUp – Home</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- NAVBAR -->
-  <div class="navbar">
-    <div class="logo">LaceUp</div>
-    <div class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
-      <a href="login.html">Login</a>
-      <a href="signup.html">Sign Up</a>
-    </div>
-  </div>
-  <!-- NAVBAR -->
-  <div class="navbar">
-    <div class="logo">LaceUp</div>
-    <div class="nav-links">
-      <a href="/">Home</a>
-      <a href="/cart.html">Cart (<span id="cart-count">0</span>)</a>
-      <a href="/login.html">Login</a>
-      <a href="/signup.html">Sign Up</a>
-    </div>
-  </div>
 
-  <!-- HERO SECTION -->
-  <div class="container hero">
-    <h1>Welcome to LaceUp Sneaker Store</h1>
-    <p>Shop the latest sneakers and gear!</p>
-  </div>
+  <header>
+    <h1>Welcome to LaceUp</h1>
+  </header>
 
-  <!-- FEATURED PRODUCTS -->
-  <div class="container">
+  <section id="featured-container">
     <h2>Featured Sneakers</h2>
-    <div id="product-list" class="grid">
-      <!-- Products will be loaded here via script.js -->
-    </div>
-  </div>
-
-  <!-- FOOTER -->
-  <div class="container">
-    <footer style="text-align:center; margin-top:40px;">
-      &copy; 2025 LaceUp Sneaker Store. All rights reserved.
-    </footer>
-  </div>
+    <div id="products"></div>
+  </section>
 
   <script src="script.js"></script>
 </body>

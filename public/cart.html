@@ -2,73 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cart - LaceUp</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Your Cart</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="navbar">
-    <div class="logo">LaceUp</div>
-    <div class="nav-links">
-      <a href="/">Home</a>
-      <a href="/cart.html">Cart <span id="cart-count">0</span></a>
-      <a href="/login.html">Login</a>
-      <a href="/signup.html">Sign Up</a>
-    </div>
-  </div>
 
-  <div class="container">
-    <h1>Your Cart</h1>
-    <div id="cart-items"></div>
-    <div id="cart-summary"></div>
-  </div>
+<h1>Your Cart</h1>
 
-  <script src="script.js"></script>
-  <script>
-    function renderCart() {
-      const cart = getCart();
-      const container = document.getElementById('cart-items');
-      container.innerHTML = '';
+<div id="cart-items"></div>
 
-      if (cart.length === 0) {
-        container.innerHTML = '<p>Your cart is empty.</p>';
-        document.getElementById('cart-summary').innerHTML = '';
-        return;
-      }
+<a href="/checkout.html">
+  <button>Proceed to Checkout</button>
+</a>
 
-      cart.forEach(item => {
-        container.innerHTML += `
-          <div class="cart-item">
-            <img src="${item.image_url}" alt="${item.name}" width="100">
-            <div>${item.name}</div>
-            <div>$${item.price} x ${item.quantity}</div>
-            <button onclick="removeFromCart(${item.id})">Remove</button>
-          </div>
-        `;
-      });
-
-      const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      const tax = +(subtotal * 0.0825).toFixed(2);
-      const total = +(subtotal + tax).toFixed(2);
-
-      document.getElementById('cart-summary').innerHTML = `
-        <p>Subtotal: $${subtotal.toFixed(2)}</p>
-        <p>Tax: $${tax}</p>
-        <p><strong>Total: $${total}</strong></p>
-      `;
-    }
-
-    function removeFromCart(id) {
-      let cart = getCart();
-      cart = cart.filter(item => item.id !== id);
-      saveCart(cart);
-      renderCart();
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      updateCartCount();
-      renderCart();
-    });
-  </script>
+<script src="cart.js"></script>
 </body>
 </html>
