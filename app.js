@@ -2,7 +2,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const db = require('./database/connection'); // CommonJS import
+const db = require('./db/connection'); // CommonJS import
 require('dotenv').config();
 
 const app = express();
