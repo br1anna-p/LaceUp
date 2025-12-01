@@ -69,6 +69,29 @@ app.get('/api/products/:id/sizes', (req, res) => {
 });
 
 // =====================
+// GET DISCOUNT BY CODE
+// =====================
+app.get('/api/discount/:code', (req, res) => {
+  const code = req.params.code;
+
+  const query = `
+    SELECT * FROM discounts 
+    WHERE code = ? AND active = TRUE
+  `;
+
+  db.query(query, [code], (err, results) => {
+    if (err) return res.status(500).json({ success: false });
+
+    if (results.length === 0) {
+      return res.json({ success: false }); // invalid or inactive
+    }
+
+    res.json({ success: true, discount: results[0] });
+  });
+});
+
+
+// =====================
 // USER REGISTRATION
 // =====================
 app.post('/api/register', (req, res) => {
