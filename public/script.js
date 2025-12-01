@@ -1,6 +1,6 @@
 async function loadFeaturedProducts() {
   try {
-    const res = await fetch("/api/products/featured");
+    const res = await fetch("/api/products");
     const products = await res.json();
 
     const container = document.getElementById("products");
