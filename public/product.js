@@ -1,7 +1,3 @@
-// =====================
-// product.js
-// =====================
-
 // Get product ID from URL
 const urlParams = new URLSearchParams(window.location.search);
 const productId = urlParams.get('id');
@@ -24,14 +20,14 @@ async function loadProduct() {
     imgEl.alt = product.name;
     nameEl.textContent = product.name;
     descEl.textContent = product.description;
-    priceEl.textContent = `$${product.price.toFixed(2)}`;
+    // Convert price to number first
+    priceEl.textContent = `$${Number(product.price).toFixed(2)}`;
 
     // Fetch sizes for the product
     const sizesRes = await fetch(`/api/products/${productId}/sizes`);
     if (!sizesRes.ok) throw new Error('Sizes not found');
     const sizes = await sizesRes.json();
 
-    sizeSelect.innerHTML = ''; // Clear existing options
     sizes.forEach(size => {
       const option = document.createElement('option');
       option.value = size.id;
