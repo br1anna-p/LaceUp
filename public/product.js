@@ -9,19 +9,20 @@ const priceEl = document.getElementById('product-price');
 const sizeSelect = document.getElementById('size-select');
 const addToCartBtn = document.getElementById('add-to-cart');
 
+let product; // store product info globally
+
 async function loadProduct() {
   try {
     // Fetch product details
     const res = await fetch(`/api/products/${productId}`);
     if (!res.ok) throw new Error('Product not found');
-    const product = await res.json();
+    product = await res.json();
 
     imgEl.src = product.image_url;
     imgEl.alt = product.name;
     nameEl.textContent = product.name;
     descEl.textContent = product.description;
-    // Convert price to number first
-    priceEl.textContent = `$${Number(product.price).toFixed(2)}`;
+    priceEl.textContent = `$${parseFloat(product.price).toFixed(2)}`;
 
     // Fetch sizes for the product
     const sizesRes = await fetch(`/api/products/${productId}/sizes`);
@@ -49,8 +50,23 @@ addToCartBtn.addEventListener('click', () => {
     alert('Please select a size');
     return;
   }
-  alert(`Product ${productId} (size ID: ${selectedSizeId}) added to cart!`);
-  // TODO: Replace alert with actual cart logic (localStorage or API call)
+
+  // Get existing cart from localStorage or empty array
+  let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+  // Add the product
+  cart.push({
+    id: productId,
+    name: nameEl.textContent,
+    price: parseFloat(product.price),
+    sizeId: selectedSizeId,
+    image: imgEl.src
+  });
+
+  // Save back to localStorage
+  localStorage.setItem('cart', JSON.stringify(cart));
+
+  alert(`${nameEl.textContent} added to cart!`);
 });
 
 loadProduct();
