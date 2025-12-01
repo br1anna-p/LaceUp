@@ -58,4 +58,22 @@ document.getElementById("searchInput").addEventListener("input", function () {
   displayFilteredProducts(filtered);
 });
 
+// Sorting dropdown listener
+document.getElementById("sortSelect").addEventListener("change", function () {
+  const option = this.value;
+
+  let sortedList = [...allProducts]; // copy the array so we don’t modify original
+
+  if (option === "low-high") {
+    sortedList.sort((a, b) => a.price - b.price); // ascending
+  } 
+  else if (option === "high-low") {
+    sortedList.sort((a, b) => b.price - a.price); // descending
+  }
+
+  // Show sorted products
+  displayFilteredProducts(sortedList);
+});
+
+
 
