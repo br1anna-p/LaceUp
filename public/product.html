@@ -7,20 +7,23 @@
 </head>
 <body>
 
-<a href="/">← Back</a>
+  <header>
+    <a href="/">← Back to Home</a>
+  </header>
 
-<div id="product-page">
-  <img id="product-img" />
-  <h1 id="product-name"></h1>
-  <p id="product-desc"></p>
-  <strong id="product-price"></strong>
+  <main id="product-page">
+    <img id="product-img" alt="Product Image" />
+    <h1 id="product-name">Product Name</h1>
+    <p id="product-desc">Product Description</p>
+    <strong id="product-price">$0.00</strong>
 
-  <label>Select Size:</label>
-  <select id="size-select"></select>
+    <div class="product-actions">
+      <label for="size-select">Select Size:</label>
+      <select id="size-select"></select>
+      <button id="add-to-cart">Add to Cart</button>
+    </div>
+  </main>
 
-  <button id="add-to-cart">Add to Cart</button>
-</div>
-
-<script src="product.js"></script>
+  <script src="product.js"></script>
 </body>
 </html>
