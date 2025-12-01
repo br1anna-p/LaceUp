@@ -1,40 +1,55 @@
+// Get product ID from URL
+const urlParams = new URLSearchParams(window.location.search);
+const productId = urlParams.get('id');
+
+const imgEl = document.getElementById('product-img');
+const nameEl = document.getElementById('product-name');
+const descEl = document.getElementById('product-desc');
+const priceEl = document.getElementById('product-price');
+const sizeSelect = document.getElementById('size-select');
+const addToCartBtn = document.getElementById('add-to-cart');
+
 async function loadProduct() {
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
+  try {
+    // Fetch product details
+    const res = await fetch(`/api/products/${productId}`);
+    if (!res.ok) throw new Error('Product not found');
+    const product = await res.json();
 
-  const res = await fetch(`/api/products/${id}`);
-  const product = await res.json();
+    imgEl.src = product.image_url;
+    imgEl.alt = product.name;
+    nameEl.textContent = product.name;
+    descEl.textContent = product.description;
+    priceEl.textContent = `$${product.price.toFixed(2)}`;
 
-  const sizesRes = await fetch(`/api/products/${id}/sizes`);
-  const sizes = await sizesRes.json();
+    // Fetch sizes for the product
+    const sizesRes = await fetch(`/api/products/${productId}/sizes`);
+    if (!sizesRes.ok) throw new Error('Sizes not found');
+    const sizes = await sizesRes.json();
 
-  const page = document.getElementById("product-details");
+    sizes.forEach(size => {
+      const option = document.createElement('option');
+      option.value = size.id;
+      option.textContent = `${size.size} (${size.quantity} in stock)`;
+      sizeSelect.appendChild(option);
+    });
 
-  page.innerHTML = `
-    <img src="${product.image_url}" alt="${product.name}">
-    <h2>${product.name}</h2>
-    <p>${product.description}</p>
-    <strong>$${product.price}</strong>
-
-    <label>Size:</label>
-    <select id="size-select">
-      ${sizes.map(s => `<option value="${s.id}">${s.size}</option>`).join("")}
-    </select>
-
-    <button onclick="addToCart(${product.id})">Add to Cart</button>
-  `;
+  } catch (err) {
+    console.error('Error loading product:', err);
+    document.getElementById('product-page').innerHTML =
+      '<p>Unable to load product at this time.</p>';
+  }
 }
 
-function addToCart(id) {
-  const sizeId = document.getElementById("size-select").value;
-
-  let cart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-  cart.push({ id, sizeId, qty: 1 });
-
-  localStorage.setItem("cart", JSON.stringify(cart));
-
-  alert("Added to cart!");
-}
+// Add to Cart functionality
+addToCartBtn.addEventListener('click', () => {
+  const selectedSizeId = sizeSelect.value;
+  if (!selectedSizeId) {
+    alert('Please select a size');
+    return;
+  }
+  alert(`Product ${productId} (size ID: ${selectedSizeId}) added to cart!`);
+  // TODO: Replace alert with actual cart logic (localStorage or API call)
+});
 
 loadProduct();
