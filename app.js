@@ -44,6 +44,31 @@ app.get('/api/products', (req, res) => {
 });
 
 // =====================
+// GET SINGLE PRODUCT BY ID
+// =====================
+app.get('/api/products/:id', (req, res) => {
+  const productId = req.params.id;
+  const query = 'SELECT * FROM products WHERE id = ?';
+  db.query(query, [productId], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    if (results.length === 0) return res.status(404).json({ error: 'Product not found' });
+    res.json(results[0]);
+  });
+});
+
+// =====================
+// GET SIZES FOR A PRODUCT
+// =====================
+app.get('/api/products/:id/sizes', (req, res) => {
+  const productId = req.params.id;
+  const query = 'SELECT * FROM product_sizes WHERE product_id = ?';
+  db.query(query, [productId], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    res.json(results);
+  });
+});
+
+// =====================
 // USER REGISTRATION
 // =====================
 app.post('/api/register', (req, res) => {
