@@ -1,3 +1,7 @@
+// =====================
+// product.js
+// =====================
+
 // Get product ID from URL
 const urlParams = new URLSearchParams(window.location.search);
 const productId = urlParams.get('id');
@@ -27,6 +31,7 @@ async function loadProduct() {
     if (!sizesRes.ok) throw new Error('Sizes not found');
     const sizes = await sizesRes.json();
 
+    sizeSelect.innerHTML = ''; // Clear existing options
     sizes.forEach(size => {
       const option = document.createElement('option');
       option.value = size.id;
