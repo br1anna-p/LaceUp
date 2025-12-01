@@ -1,30 +1,39 @@
-async function loadCart() {
-  const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-  const container = document.getElementById("cart-items");
+const cartItemsEl = document.getElementById('cart-items');
+const cartTotalEl = document.getElementById('cart-total');
 
-  container.innerHTML = "";
+// Load cart from localStorage
+const cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-  for (let item of cart) {
-    const res = await fetch(`/api/products/${item.id}`);
-    const product = await res.json();
-
-    container.innerHTML += `
-      <div class="cart-item">
-        <img src="${product.image_url}">
-        <p>${product.name}</p>
-        <p>Size: ${item.sizeId}</p>
-        <p>$${product.price}</p>
-        <button onclick="removeItem(${item.id}, ${item.sizeId})">Remove</button>
+if (cart.length === 0) {
+  cartItemsEl.innerHTML = '<p>Your cart is empty.</p>';
+  cartTotalEl.textContent = '';
+} else {
+  let total = 0;
+  cart.forEach((item, index) => {
+    total += item.price;
+    const div = document.createElement('div');
+    div.classList.add('cart-item');
+    div.innerHTML = `
+      <img src="${item.image}" alt="${item.name}" width="100">
+      <div class="cart-info">
+        <strong>${item.name}</strong>
+        <p>Size ID: ${item.sizeId}</p>
+        <p>Price: $${item.price.toFixed(2)}</p>
+        <button class="remove-btn" data-index="${index}">Remove</button>
       </div>
     `;
-  }
-}
+    cartItemsEl.appendChild(div);
+  });
 
-function removeItem(id, sizeId) {
-  let cart = JSON.parse(localStorage.getItem("cart") || "[]");
-  cart = cart.filter(i => !(i.id == id && i.sizeId == sizeId));
-  localStorage.setItem("cart", JSON.stringify(cart));
-  loadCart();
-}
+  cartTotalEl.textContent = `Total: $${total.toFixed(2)}`;
 
-loadCart();
+  // Remove item functionality
+  document.querySelectorAll('.remove-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const index = e.target.dataset.index;
+      cart.splice(index, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      location.reload(); // refresh to update cart
+    });
+  });
+}
