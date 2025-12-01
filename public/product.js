@@ -66,7 +66,36 @@ addToCartBtn.addEventListener('click', () => {
   // Save back to localStorage
   localStorage.setItem('cart', JSON.stringify(cart));
 
-  alert(`${nameEl.textContent} added to cart!`);
+    // Save back to localStorage
+  localStorage.setItem('cart', JSON.stringify(cart));
+
+  // -------------------------
+  // Inline "added to cart" notice with View Cart link
+  // -------------------------
+  const notice = document.getElementById('cart-notice');
+
+  // Fill the notice with message, a View Cart link, and a close button
+  notice.innerHTML = `
+    <div class="notice-inner" role="status" style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:6px;background:#fff;border:1px solid #ddd;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+      <span style="font-weight:600">${nameEl.textContent} added to cart.</span>
+      <a href="cart.html" class="view-cart-btn" style="padding:8px 12px;border-radius:6px;background:#222;color:#fff;text-decoration:none;font-weight:600;">View Cart</a>
+      <button class="close-notice" aria-label="Close" style="background:transparent;border:none;font-size:18px;line-height:1;cursor:pointer;">&times;</button>
+    </div>
+  `;
+
+  // Show the notice
+  notice.style.display = 'block';
+
+  // Close handler
+  const closeBtn = notice.querySelector('.close-notice');
+  const closeNotice = () => {
+    notice.style.display = 'none';
+    notice.innerHTML = '';
+  };
+  if (closeBtn) closeBtn.addEventListener('click', closeNotice);
+
+  // Auto-hide after 6 seconds
+  setTimeout(closeNotice, 6000);
 });
 
 loadProduct();
