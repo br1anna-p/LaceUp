@@ -13,12 +13,14 @@
       background: white;
       border: 1px solid #ddd;
       text-align: center;
+      font-family: Arial, sans-serif;
     }
     a {
       display: inline-block;
       margin-top: 1rem;
       color: #222;
       font-weight: bold;
+      text-decoration: none;
     }
   </style>
 </head>
@@ -27,8 +29,23 @@
   <div class="message-box">
     <h2>🎉 Order Complete!</h2>
     <p>Thank you for shopping with LaceUp.</p>
+
+    <p>Your order number is:</p>
+    <h3 id="order-id">Loading...</h3>
+
     <a href="/">Return Home</a>
   </div>
+
+  <script>
+    // Grab last order ID from localStorage
+    const orderId = localStorage.getItem("last_order_id");
+
+    // Display it
+    document.getElementById("order-id").textContent = orderId || "Unavailable";
+
+    // Optional: Clear after showing
+    localStorage.removeItem("last_order_id");
+  </script>
 
 </body>
 </html>
