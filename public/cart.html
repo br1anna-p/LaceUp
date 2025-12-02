@@ -67,24 +67,26 @@
   <h1 style="text-align:center; margin-top:1rem;">My Cart</h1>
 
   <div id="cart-items"></div>
-
-  <div id="discount-section" style="padding: 2rem;">
-  <h3>Promo Code</h3>
-  <input 
-    id="discount-input" 
-    type="text" 
-    placeholder="Enter DISCOUNT CODE"
-    style="padding: 10px; width: 250px; text-transform: uppercase;"
-  >
-  <button id="apply-discount-btn" style="padding: 10px 15px;">Apply</button>
-
-  <p id="discount-message" style="margin-top:10px; font-weight:bold;"></p>
-
-  <div id="applied-discounts" style="margin-top:1rem;"></div>
-</div>
-
   
   <p id="cart-total"></p>
+
+  <div id="discount-section" style="padding: 1rem 2rem;">
+  <input 
+    type="text" 
+    id="discount-code" 
+    placeholder="Enter promo code"
+    style="padding: 0.5rem; font-size:1rem;"
+  >
+  <button 
+    id="apply-discount-btn"
+    style="padding:0.5rem 1rem; background:#222; color:white; border:none; border-radius:5px; cursor:pointer;"
+  >
+    Apply Discount
+  </button>
+
+  <p id="discount-message" style="font-weight:bold;"></p>
+</div>
+
 
   <script src="cart.js"></script>
 </body>
