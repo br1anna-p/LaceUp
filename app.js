@@ -127,8 +127,6 @@ app.post('/api/register', (req, res) => {
 // =====================
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password)
-    return res.status(400).json({ error: 'Please provide email and password' });
 
   db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
     if (err) return res.status(500).json({ error: 'Database error' });
@@ -136,29 +134,22 @@ app.post('/api/login', (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
 
     const user = results[0];
-    const isMatch = bcrypt.compareSync(password, user.password_hash);
 
-    if (!isMatch) return res.status(401).json({ error: 'Invalid email or password' });
-
-    const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
-      process.env.JWT_SECRET || 'secretkey',
-      { expiresIn: '1h' }
-    );
+    // SIMPLE check: password must equal the stored hash string
+    if (password !== user.password_hash) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
 
     res.json({
       message: 'Login successful!',
-      token,
       user: {
         id: user.id,
-        F_name: user.F_name,
-        L_name: user.L_name,
-        email: user.email,
-        role: user.role,
-      },
+        email: user.email
+      }
     });
   });
 });
+
 
 // =====================
 // 404 ROUTE
