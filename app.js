@@ -128,23 +128,35 @@ app.post('/api/register', (req, res) => {
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
 
-  db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
-    if (err) return res.status(500).json({ error: 'Database error' });
-    if (results.length === 0)
-      return res.status(401).json({ error: 'Invalid email or password' });
+  if (!email || !password) {
+    return res.status(400).json({ error: "Please provide email and password" });
+  }
+
+  // IMPORTANT: table name MUST be `users`
+  db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
+    if (err) return res.status(500).json({ error: "Database error" });
+
+    if (results.length === 0) {
+      return res.status(401).json({ error: "Invalid email or password" });
+    }
 
     const user = results[0];
 
-    // SIMPLE check: password must equal the stored hash string
+    // SIMPLE password check (because your DB stores plain passwords)
     if (password !== user.password_hash) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+      return res.status(401).json({ error: "Invalid email or password" });
     }
 
+    // SUCCESS — respond with user info
     res.json({
-      message: 'Login successful!',
+      success: true,
+      message: "Login successful!",
       user: {
         id: user.id,
-        email: user.email
+        F_name: user.F_name,
+        L_name: user.L_name,
+        email: user.email,
+        role: user.role
       }
     });
   });
