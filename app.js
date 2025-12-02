@@ -72,7 +72,7 @@ app.get('/api/products/:id/sizes', (req, res) => {
 // GET DISCOUNT BY CODE
 // =====================
 app.get('/api/discount/:code', (req, res) => {
-  const code = req.params.code;
+  const code = req.params.code.toUpperCase();
 
   const query = `
     SELECT * FROM discounts 
