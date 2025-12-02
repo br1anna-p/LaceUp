@@ -1,4 +1,4 @@
-document.getElementById("signupForm").addEventListener("submit", async (e) => {
+document.getElementById("signup-form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const res = await fetch("/api/register", {
@@ -18,6 +18,6 @@ document.getElementById("signupForm").addEventListener("submit", async (e) => {
     alert("Account created!");
     window.location = "/login.html";
   } else {
-    alert(data.error);
+    alert(data.error || "Signup failed.");
   }
 });
