@@ -163,52 +163,27 @@ app.post('/api/login', (req, res) => {
 });
 
 // =====================
-// PLACE ORDER
+// PLACE ORDER (fake save for now)
 // =====================
 app.post("/api/place-order", (req, res) => {
   const { userId, items, total, shippingMethod, address } = req.body;
 
-  if (!items || items.length === 0) {
-    return res.status(400).json({ success: false, message: "Cart is empty" });
+  // Basic validation
+  if (!items || !Array.isArray(items) || items.length === 0) {
+    return res.json({ success: false, message: "No items in order." });
   }
 
-  // Insert order into `orders` table
-  const orderQuery = `
-    INSERT INTO orders (user_id, total_amount, shipping_method, address)
-    VALUES (?, ?, ?, ?)
-  `;
+  // Simulate order ID (since we are not storing in DB)
+  const fakeOrderId = Math.floor(Math.random() * 900000) + 100000;
 
-  db.query(
-    orderQuery,
-    [userId || null, total, shippingMethod, address],
-    (err, result) => {
-      if (err) return res.status(500).json({ success: false });
+  console.log("ORDER RECEIVED:");
+  console.log({ userId, items, total, shippingMethod, address });
 
-      const orderId = result.insertId;
-
-      // Insert each item into `order_items`
-      const itemQuery = `
-        INSERT INTO order_items (order_id, product_id, size_id, price)
-        VALUES ?
-      `;
-
-      const formattedItems = items.map(i => [
-        orderId,
-        i.id,
-        i.sizeId,
-        i.price
-      ]);
-
-      db.query(itemQuery, [formattedItems], (err2) => {
-        if (err2) return res.status(500).json({ success: false });
-
-        res.json({ success: true, orderId });
-      });
-    }
-  );
+  return res.json({
+    success: true,
+    orderId: fakeOrderId
+  });
 });
-
-
 
 // =====================
 // 404 ROUTE
