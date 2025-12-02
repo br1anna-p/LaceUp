@@ -103,7 +103,7 @@ document.getElementById("add-product-form").addEventListener("submit", async (e)
       description: desc,
       image_url: image,
       price,
-      quantity: 0  // this will NOT be used—sizes carry quantity
+      quantity: 1  // this will NOT be used—sizes carry quantity
     })
   });
 
