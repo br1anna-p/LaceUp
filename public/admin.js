@@ -9,6 +9,7 @@ if (!user || user.role !== "admin") {
 document.getElementById("admin-welcome").textContent =
   `Logged in as: ${user.F_name} (Admin)`;
 
+
 // ==========================
 // LOAD PRODUCTS
 // ==========================
@@ -181,13 +182,14 @@ async function loadOrders() {
     table.innerHTML += `
       <tr>
         <td>${o.id}</td>
-        <td>${o.order_date}</td>
+        <td>${o.order_date || "N/A"}</td>
         <td>$${o.total}</td>
         <td>${o.user_id}</td>
       </tr>
     `;
   });
 }
+
 
 // Run all
 loadProducts();
