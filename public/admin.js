@@ -1,97 +1,68 @@
-// ===============================
-// ADMIN AUTH CHECK
-// ===============================
+// Redirect if not admin
 const user = JSON.parse(localStorage.getItem("user"));
 
 if (!user || user.role !== "admin") {
-  alert("Access denied: Admins only");
+  alert("Access denied — Admins only");
   window.location = "/";
 }
 
-// Show greeting
 document.getElementById("admin-welcome").textContent =
-  `Logged in as: ${user.F_name} (${user.role})`;
+  `Logged in as: ${user.F_name} (Admin)`;
 
-
-// ===============================
+// ==========================
 // LOAD PRODUCTS
-// ===============================
+// ==========================
 async function loadProducts() {
   const res = await fetch("/api/products");
   const products = await res.json();
 
-  let html = `
-    <table>
-      <tr>
-        <th>ID</th><th>Name</th><th>Price</th><th>Image</th><th>Actions</th>
-      </tr>
-  `;
+  const table = document.getElementById("product-table");
 
   products.forEach(p => {
-    html += `
+    table.innerHTML += `
       <tr>
         <td>${p.id}</td>
         <td>${p.name}</td>
         <td>$${p.price}</td>
-        <td><img src="${p.image_url}" width="60"></td>
         <td><button onclick="deleteProduct(${p.id})">Delete</button></td>
       </tr>
     `;
   });
-
-  html += "</table>";
-  document.getElementById("products-table").innerHTML = html;
 }
 
-
-// ===============================
-// DELETE PRODUCT
-// ===============================
 async function deleteProduct(id) {
-  if (!confirm("Delete this product?")) return;
-
-  const res = await fetch(`/api/products/${id}`, {
-    method: "DELETE"
-  });
-
+  const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
   const data = await res.json();
-  if (data.success) loadProducts();
+
+  if (data.success) {
+    alert("Product deleted.");
+    location.reload();
+  }
 }
 
-
-// ===============================
+// ==========================
 // LOAD DISCOUNTS
-// ===============================
+// ==========================
 async function loadDiscounts() {
   const res = await fetch("/api/discounts");
   const discounts = await res.json();
 
-  let html = `
-    <table>
-      <tr><th>Code</th><th>Type</th><th>Amount</th><th>Active</th></tr>
-  `;
+  const table = document.getElementById("discount-table");
 
   discounts.forEach(d => {
-    html += `
+    table.innerHTML += `
       <tr>
         <td>${d.code}</td>
         <td>${d.type}</td>
         <td>${d.amount}</td>
-        <td>${d.active ? "YES" : "NO"}</td>
+        <td>${d.active ? "Yes" : "No"}</td>
       </tr>
     `;
   });
-
-  html += "</table>";
-  document.getElementById("discounts-table").innerHTML = html;
 }
 
-
-// ===============================
-// CREATE DISCOUNT
-// ===============================
-async function createDiscount() {
-  const code = document.getElementById("new-discount-code").value.toUpperCase();
+document.getElementById("add-discount-btn").addEventListener("click", async () => {
+  const code = document.getElementById("new-discount-code").value.trim();
   const amount = document.getElementById("new-discount-amount").value;
   const type = document.getElementById("new-discount-type").value;
 
@@ -102,42 +73,38 @@ async function createDiscount() {
   });
 
   const data = await res.json();
-  if (data.success) {
-    alert("Discount created!");
-    loadDiscounts();
+
+  if (!data.success) {
+    alert("Error creating discount.");
+    return;
   }
-}
 
+  alert("Discount created!");
+  location.reload();
+});
 
-// ===============================
+// ==========================
 // LOAD ORDERS
-// ===============================
+// ==========================
 async function loadOrders() {
   const res = await fetch("/api/orders");
   const orders = await res.json();
 
-  let html = `
-    <table>
-      <tr><th>Order ID</th><th>User</th><th>Total</th><th>Date</th></tr>
-  `;
+  const table = document.getElementById("order-table");
 
   orders.forEach(o => {
-    html += `
+    table.innerHTML += `
       <tr>
         <td>${o.id}</td>
-        <td>${o.user_id}</td>
-        <td>$${o.total}</td>
         <td>${o.order_date}</td>
+        <td>$${o.total}</td>
+        <td>${o.user_id}</td>
       </tr>
     `;
   });
-
-  html += "</table>";
-  document.getElementById("orders-table").innerHTML = html;
 }
 
-
-// Run initial loads
+// Run all
 loadProducts();
 loadDiscounts();
 loadOrders();
