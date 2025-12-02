@@ -249,6 +249,29 @@ app.post("/api/products", (req, res) => {
     res.json({ success: true, productId: result.insertId });
   });
 });
+// =====================
+// ADD SIZE TO PRODUCT
+// =====================
+app.post("/api/product-sizes", (req, res) => {
+  const { product_id, size, quantity } = req.body;
+
+  if (!product_id || !size || !quantity) {
+    return res.json({ success: false, message: "Missing fields" });
+  }
+
+  const sql = `
+    INSERT INTO product_sizes (product_id, size, quantity)
+    VALUES (?, ?, ?)
+  `;
+
+  db.query(sql, [product_id, size, quantity], (err) => {
+    if (err) {
+      return res.json({ success: false, message: "Error adding size" });
+    }
+    res.json({ success: true });
+  });
+});
+
 
 
 // =====================
