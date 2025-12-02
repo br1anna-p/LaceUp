@@ -61,38 +61,40 @@ async function loadDiscounts() {
   });
 }
 
-// ======================================================
-// ADD SIZE ROW BUTTON (THIS MUST BE OUTSIDE EVERYTHING)
-// ======================================================
+// ===============================
+// ADD SIZE BUTTON (MUST BE OUTSIDE)
+// ===============================
 document.getElementById("add-size-btn").addEventListener("click", () => {
   const container = document.getElementById("size-area");
 
   container.innerHTML += `
     <div class="size-row">
-      <input type="text" class="size-input" placeholder="Size (ex: 5, 6, 7)">
+      <input type="text" class="size-input" placeholder="Size (ex: 6, 5T, 6Y)">
       <input type="number" class="qty-input" placeholder="Quantity">
     </div>
   `;
 });
 
 // ==========================
-// ADD PRODUCT + SIZES
+// ADD PRODUCT + ADD SIZES
 // ==========================
-document.getElementById("add-product-btn").addEventListener("click", async () => {
-  const name = document.getElementById("new-product-name").value.trim();
-  const desc = document.getElementById("new-product-desc").value.trim();
-  const image = document.getElementById("new-product-image").value.trim();
-  const price = document.getElementById("new-product-price").value.trim();
-  const quantity = document.getElementById("new-product-quantity").value.trim();
+document.getElementById("add-product-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const name = document.getElementById("p-name").value.trim();
+  const desc = document.getElementById("p-desc").value.trim();
+  const price = document.getElementById("p-price").value.trim();
+  const image = document.getElementById("p-img").value.trim();
+
   const msg = document.getElementById("product-message");
 
-  if (!name || !desc || !image || !price || !quantity) {
+  if (!name || !desc || !price || !image) {
     msg.style.color = "red";
-    msg.textContent = "Please fill out all product fields.";
+    msg.textContent = "Please fill all product fields.";
     return;
   }
 
-  // create product
+  // 1️⃣ Create product first
   const res = await fetch("/api/products", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -101,39 +103,44 @@ document.getElementById("add-product-btn").addEventListener("click", async () =>
       description: desc,
       image_url: image,
       price,
-      quantity
+      quantity: 0  // this will NOT be used—sizes carry quantity
     })
   });
 
   const data = await res.json();
 
-  if (data.success) {
-    // Add sizes
-    const sizeRows = document.querySelectorAll(".size-row");
-
-    for (const row of sizeRows) {
-      const size = row.querySelector(".size-input").value.trim();
-      const qty = row.querySelector(".qty-input").value.trim();
-
-      if (!size || !qty) continue;
-
-      await fetch("/api/product-sizes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          product_id: data.productId,
-          size,
-          quantity: qty
-        })
-      });
-    }
-
-    msg.style.color = "green";
-    msg.textContent = "Product + sizes added!";
-  } else {
+  if (!data.success) {
     msg.style.color = "red";
     msg.textContent = "Failed to add product.";
+    return;
   }
+
+  const productId = data.productId;
+
+  // 2️⃣ Add each size row
+  const sizeRows = document.querySelectorAll(".size-row");
+
+  for (const row of sizeRows) {
+    const size = row.querySelector(".size-input").value.trim();
+    const qty = row.querySelector(".qty-input").value.trim();
+
+    if (!size || !qty) continue;
+
+    await fetch("/api/product-sizes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        product_id: productId,
+        size,
+        quantity: qty
+      })
+    });
+  }
+
+  msg.style.color = "green";
+  msg.textContent = "Product + sizes added successfully!";
+  document.getElementById("add-product-form").reset();
+  document.getElementById("size-area").innerHTML = "";
 });
 
 // ==========================
