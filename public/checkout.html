@@ -115,15 +115,16 @@
     <!-- SHIPPING -->
     <div class="section-box">
       <h2 class="section-title">1. Shipping Address</h2>
-      <input type="text" id="ship-first" placeholder="First Name *">
-      <input type="text" id="ship-last" placeholder="Last Name *">
-      <input type="text" id="ship-address" placeholder="Street Address *">
-      <input type="text" id="ship-address2" placeholder="Address Line 2 (optional)">
-      <input type="text" id="ship-city" placeholder="City *">
-      <input type="text" id="ship-state" placeholder="State *">
-      <input type="text" id="ship-zip" placeholder="ZIP Code *">
-      <input type="email" id="ship-email" placeholder="Email *">
-      <input type="text" id="ship-phone" placeholder="Phone Number *">
+      <input type="text" id="first-name" placeholder="First Name *">
+      <input type="text" id="last-name" placeholder="Last Name *">
+      <input type="text" id="address" placeholder="Street Address *">
+      <input type="text" id="address2" placeholder="Address Line 2 (optional)">
+      <input type="text" id="city" placeholder="City *">
+      <input type="text" id="state" placeholder="State *">
+      <input type="text" id="zip" placeholder="ZIP Code *">
+      <input type="email" id="email" placeholder="Email *">
+      <input type="text" id="phone" placeholder="Phone Number *">
+
     </div>
 
     <!-- BILLING -->
@@ -158,17 +159,18 @@
         <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Paypal_2014_logo.png">
       </div>
 
-      <input type="text" placeholder="Name on Card">
-      <input type="text" placeholder="Card Number">
-      <input type="text" placeholder="Expiration (MM/YY)">
-      <input type="text" placeholder="Security Code (CVV)">
+    <input type="text" id="card-name" placeholder="Name on Card">
+    <input type="text" id="card-number" placeholder="Card Number">
+    <input type="text" id="card-exp" placeholder="Expiration (MM/YY)">
+    <input type="text" id="card-cvv" placeholder="Security Code (CVV)">
+
     </div>
 
     <!-- ORDER REVIEW -->
     <div class="section-box">
       <h2 class="section-title">5. Order Review</h2>
       <p>Your items are listed on the right.</p>
-      <p><strong>Final Total:</strong> $<span id="checkout-total">0.00</span></p>
+      <p><strong>Final Total:</strong> $<span id="checkout-total-bottom">0.00</span></p>
       <p id="checkout-error" style="color:red; font-weight:bold; display:none;"></p>
       <button class="btn-place-order" id="place-order-btn">Place My Order</button>
     </div>
