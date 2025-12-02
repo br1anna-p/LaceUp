@@ -1,21 +1,34 @@
-const cartItemsEl = document.getElementById('cart-items');
-const cartTotalEl = document.getElementById('cart-total');
+// =====================
+// CART SETUP
+// =====================
+const cartItemsEl = document.getElementById("cart-items");
+const cartTotalEl = document.getElementById("cart-total");
 
-// Load cart from localStorage
-const cart = JSON.parse(localStorage.getItem('cart')) || [];
-let originalTotal = 0; // we'll use this for discounts
+const cart = JSON.parse(localStorage.getItem("cart")) || [];
+let originalTotal = 0;
 
+// Load saved discounts
+let appliedDiscounts =
+  JSON.parse(localStorage.getItem("appliedDiscounts")) || [];
+
+function saveDiscounts() {
+  localStorage.setItem("appliedDiscounts", JSON.stringify(appliedDiscounts));
+}
+
+// --------------------
+// DISPLAY CART
+// --------------------
 if (cart.length === 0) {
-  cartItemsEl.innerHTML = '<p>Your cart is empty.</p>';
-  cartTotalEl.textContent = '';
+  cartItemsEl.innerHTML = "<p>Your cart is empty.</p>";
+  cartTotalEl.textContent = "";
 } else {
   let total = 0;
 
   cart.forEach((item, index) => {
     total += item.price;
 
-    const div = document.createElement('div');
-    div.classList.add('cart-item');
+    const div = document.createElement("div");
+    div.classList.add("cart-item");
 
     div.innerHTML = `
       <img src="${item.image}" alt="${item.name}" width="100">
@@ -30,68 +43,122 @@ if (cart.length === 0) {
     cartItemsEl.appendChild(div);
   });
 
-  originalTotal = total; // save original un-discounted total
-
+  originalTotal = total;
   cartTotalEl.textContent = `Total: $${total.toFixed(2)}`;
 
-  // Remove item functionality
-  document.querySelectorAll('.remove-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+  // remove buttons
+  document.querySelectorAll(".remove-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
       const index = e.target.dataset.index;
       cart.splice(index, 1);
-      localStorage.setItem('cart', JSON.stringify(cart));
-      location.reload(); // refresh to update cart
+
+      localStorage.setItem("cart", JSON.stringify(cart));
+      location.reload();
     });
   });
 }
 
-/* -------------------------------------------------------
-   DISCOUNT CODE LOGIC
--------------------------------------------------------- */
+// =====================
+// DISCOUNT INPUT FORMAT
+// =====================
+const discountInput = document.getElementById("discount-code");
 
-document.getElementById("apply-discount-btn")?.addEventListener("click", async () => {
-  const codeInput = document.getElementById("discount-code");
-  const msg = document.getElementById("discount-message");
+if (discountInput) {
+  discountInput.addEventListener("input", () => {
+    discountInput.value = discountInput.value.toUpperCase();
+  });
+}
 
-  const code = codeInput.value.trim();
+// =====================
+// APPLY DISCOUNT
+// =====================
+document
+  .getElementById("apply-discount-btn")
+  ?.addEventListener("click", async () => {
+    const codeInput = document.getElementById("discount-code");
+    const msg = document.getElementById("discount-message");
 
-  if (!code) {
-    msg.style.color = "red";
-    msg.textContent = "Please enter a promo code.";
-    return;
-  }
-
-  try {
-    // Call backend to validate promo code
-    const response = await fetch(`/api/discount/${code}`);
-    const data = await response.json();
-
-    if (!data.success) {
+    const code = codeInput.value.trim();
+    if (!code) {
       msg.style.color = "red";
-      msg.textContent = "Invalid or inactive discount code.";
+      msg.textContent = "Please enter a promo code.";
       return;
     }
 
-    const discount = data.discount;
-
-    let finalTotal = originalTotal;
-
-    if (discount.type === "percentage") {
-      finalTotal -= (finalTotal * (discount.amount / 100));
-    } else if (discount.type === "fixed") {
-      finalTotal -= discount.amount;
+    // Prevent duplicate use
+    if (appliedDiscounts.some((d) => d.code === code)) {
+      msg.style.color = "red";
+      msg.textContent = "This discount has already been used.";
+      return;
     }
 
-    if (finalTotal < 0) finalTotal = 0;
+    try {
+      const response = await fetch(`/api/discount/${code}`);
+      const data = await response.json();
 
-    cartTotalEl.textContent = `Total after discount: $${finalTotal.toFixed(2)}`;
+      if (!data.success) {
+        msg.style.color = "red";
+        msg.textContent = "Invalid or inactive discount code.";
+        return;
+      }
 
-    msg.style.color = "green";
-    msg.textContent = `Discount applied: ${discount.code}`;
+      const discount = data.discount;
 
-  } catch (error) {
-    msg.style.color = "red";
-    msg.textContent = "Error applying discount. Try again.";
-  }
-});
+      // -------- RULES ----------
+      if (discount.type === "percentage") {
+        if (appliedDiscounts.some((d) => d.type === "percentage")) {
+          msg.style.color = "red";
+          msg.textContent = "You can only apply one percentage discount.";
+          return;
+        }
+      }
 
+      if (discount.type === "fixed") {
+        const fixedUsed = appliedDiscounts.filter(
+          (d) => d.type === "fixed"
+        ).length;
+
+        if (fixedUsed >= 2) {
+          msg.style.color = "red";
+          msg.textContent = "You can only apply two fixed discounts.";
+          return;
+        }
+      }
+
+      // Add discount
+      appliedDiscounts.push(discount);
+      saveDiscounts();
+
+      updateDisplayedTotal();
+
+      msg.style.color = "green";
+      msg.textContent = `Discount applied: ${discount.code}`;
+    } catch (error) {
+      msg.style.color = "red";
+      msg.textContent = "Error applying discount.";
+    }
+  });
+
+// =====================
+// TOTAL CALCULATION
+// =====================
+function calculateFinalTotal() {
+  let total = originalTotal;
+
+  const percent = appliedDiscounts.find((d) => d.type === "percentage");
+  if (percent) total -= total * (percent.amount / 100);
+
+  appliedDiscounts
+    .filter((d) => d.type === "fixed")
+    .slice(0, 2)
+    .forEach((d) => {
+      total -= d.amount;
+    });
+
+  return Math.max(total, 0);
+}
+
+function updateDisplayedTotal() {
+  const finalTotal = calculateFinalTotal();
+  cartTotalEl.textContent = `Total: $${finalTotal.toFixed(2)}`;
+}
