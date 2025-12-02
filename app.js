@@ -185,6 +185,52 @@ app.post("/api/place-order", (req, res) => {
   });
 });
 
+// =============================
+// ADMIN ROUTES — REQUIRED
+// =============================
+
+// Get ALL discount codes
+app.get("/api/discounts", (req, res) => {
+  db.query("SELECT * FROM discounts", (err, results) => {
+    if (err) return res.status(500).json({ error: "Failed to fetch discounts" });
+    res.json(results);
+  });
+});
+
+// Create a new discount code
+app.post("/api/discounts", (req, res) => {
+  const { code, amount, type } = req.body;
+
+  if (!code || !amount || !type)
+    return res.json({ success: false, message: "Missing fields" });
+
+  db.query(
+    "INSERT INTO discounts (code, amount, type, active) VALUES (?, ?, ?, 1)",
+    [code, amount, type],
+    (err) => {
+      if (err) return res.json({ success: false, message: "Error creating discount" });
+      res.json({ success: true });
+    }
+  );
+});
+
+// Get ALL orders (history)
+app.get("/api/orders", (req, res) => {
+  db.query("SELECT * FROM orders ORDER BY order_date DESC", (err, results) => {
+    if (err) return res.status(500).json({ error: "Failed to fetch orders" });
+    res.json(results);
+  });
+});
+
+// Delete product
+app.delete("/api/products/:id", (req, res) => {
+  db.query("DELETE FROM products WHERE id = ?", [req.params.id], (err) => {
+    if (err) return res.json({ success: false, message: "Error deleting product" });
+    res.json({ success: true });
+  });
+});
+
+
 // =====================
 // 404 ROUTE
 // =====================
