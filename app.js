@@ -235,7 +235,7 @@ app.delete("/api/products/:id", (req, res) => {
 app.post("/api/products", (req, res) => {
   const { name, description, image_url, price, quantity } = req.body;
 
-  if (!name || !description || !image_url || !price || !quantity) {
+  if (!name || !image_url || !price) {
     return res.json({ success: false, message: "Missing fields" });
   }
 
