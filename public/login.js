@@ -1,4 +1,4 @@
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
+document.getElementById("login-form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const res = await fetch("/api/login", {
