@@ -144,10 +144,10 @@ document.querySelectorAll('input[name="shipping-method"]').forEach(radio => {
 // ===============================
 // PLACE ORDER BUTTON
 // ===============================
-document.getElementById("place-order-btn").addEventListener("click", () => {
+document.getElementById("place-order-btn").addEventListener("click", async () => {
   const errorMsg = document.getElementById("checkout-error");
 
-  // Collect fields you want to validate
+  // Validate fields
   const requiredFields = [
     document.getElementById("first-name"),
     document.getElementById("last-name"),
@@ -160,21 +160,53 @@ document.getElementById("place-order-btn").addEventListener("click", () => {
     document.getElementById("card-cvv")
   ];
 
-  // Check for any empty fields
   for (let field of requiredFields) {
     if (!field || field.value.trim() === "") {
       errorMsg.textContent = "Please fill out all required fields.";
       errorMsg.style.display = "block";
-      return; // stop the checkout
+      return;
     }
   }
 
-  // If everything is filled → remove error
   errorMsg.style.display = "none";
 
-  // Now continue with placing the order
+  // Shipping
+  const shippingMethod = getSelectedShippingCost() === 0 ? "standard" : "express";
+
+  // Address combined
+  const address = `${document.getElementById("address").value}, ${document.getElementById("city").value}, ${document.getElementById("state").value}, ${document.getElementById("zip").value}`;
+
+  // Final total (already calculated)
+  const finalTotal = parseFloat(document.getElementById("checkout-total").textContent);
+
+  // Send order to backend
+  const res = await fetch("/api/place-order", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      userId: user ? user.id : null,
+      items: cart,
+      total: finalTotal,
+      shippingMethod,
+      address
+    })
+  });
+
+  const data = await res.json();
+
+  if (!data.success) {
+    errorMsg.textContent = "Something went wrong placing your order.";
+    errorMsg.style.display = "block";
+    return;
+  }
+
+  // Clear cart + discounts
   localStorage.removeItem(cartKey);
   localStorage.removeItem(discountKey);
 
+  // Save orderId for confirmation page
+  localStorage.setItem("last_order_id", data.orderId);
+
+  // Go to confirmation
   window.location = "/order-confirmation.html";
 });
