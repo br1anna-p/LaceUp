@@ -60,6 +60,43 @@ async function loadDiscounts() {
     `;
   });
 }
+document.getElementById("add-product-btn").addEventListener("click", async () => {
+  const name = document.getElementById("new-product-name").value.trim();
+  const desc = document.getElementById("new-product-desc").value.trim();
+  const image = document.getElementById("new-product-image").value.trim();
+  const price = document.getElementById("new-product-price").value.trim();
+  const quantity = document.getElementById("new-product-quantity").value.trim();
+  const msg = document.getElementById("product-message");
+
+  if (!name || !desc || !image || !price || !quantity) {
+    msg.style.color = "red";
+    msg.textContent = "Please fill out all product fields.";
+    return;
+  }
+
+  const res = await fetch("/api/products", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name,
+      description: desc,
+      image_url: image,
+      price,
+      quantity
+    })
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    msg.style.color = "green";
+    msg.textContent = "Product added!";
+  } else {
+    msg.style.color = "red";
+    msg.textContent = "Failed to add product.";
+  }
+});
+
 
 document.getElementById("add-discount-btn").addEventListener("click", async () => {
   const code = document.getElementById("new-discount-code").value.trim();
