@@ -1,20 +1,20 @@
 -- Users
 INSERT INTO users (id, F_name, L_name, email, password_hash, role) VALUES
-(1, 'Olivia', 'Martinez', 'olivia.martinez@example.com', 'Applle2', 'customer'),
-(2, 'Ethan', 'Johnson', 'ethan.johnson@example.com', 'james9', 'customer'),
-(3, 'Sophia', 'Lee', 'sophia.lee@example.com', 'table9', 'admin'),
-(4, 'Mason', 'Brown', 'mason.brown@example.com', '22lok', 'customer'),
-(5, 'Ava', 'Davis', 'ava.davis@example.com', 'Kik45l', 'customer'),
-(6, 'Liam', 'Wilson', 'liam.wilson@example.com', 'Likake', 'customer'),
+(1, 'Olivia', 'Martinez', 'olivia.martinez@example.com', 'hash001', 'customer'),
+(2, 'Ethan', 'Johnson', 'ethan.johnson@example.com', 'hash002', 'customer'),
+(3, 'Sophia', 'Lee', 'sophia.lee@example.com', 'hash003', 'admin'),
+(4, 'Mason', 'Brown', 'mason.brown@example.com', 'hash004', 'customer'),
+(5, 'Ava', 'Davis', 'ava.davis@example.com', 'hash005', 'customer'),
+(6, 'Liam', 'Wilson', 'liam.wilson@example.com', 'hash006', 'customer'),
 (7, 'Emma', 'Garcia', 'emma.garcia@example.com', 'hash007', 'customer'),
-(8, 'Noah', 'Taylor', 'noah.taylor@example.com', 'jns098', 'customer'),
-(9, 'Isabella', 'Clark', 'isabella.clark@example.com', 'gnsm839L', 'customer'),
-(10, 'Lucas', 'Hernandez', 'lucas.hernandez@example.com', 'JFao3i9', 'admin'),
-(11, 'Mia', 'Anderson', 'mia.anderson@example.com', 'JBnd9', 'customer'),
-(12, 'Benjamin', 'Lopez', 'benjamin.lopez@example.com', 'dnkvg9', 'customer'),
-(13, 'Harper', 'Gonzalez', 'harper.gonzalez@example.com', 'knvpP', 'customer'),
-(14, 'Elijah', 'Robinson', 'elijah.robinson@example.com', 'vejfa90', 'customer'),
-(15, 'Charlotte', 'Perez', 'charlotte.perez@example.com', 'advknsb8', 'customer');
+(8, 'Noah', 'Taylor', 'noah.taylor@example.com', 'hash008', 'customer'),
+(9, 'Isabella', 'Clark', 'isabella.clark@example.com', 'hash009', 'customer'),
+(10, 'Lucas', 'Hernandez', 'lucas.hernandez@example.com', 'hash010', 'admin'),
+(11, 'Mia', 'Anderson', 'mia.anderson@example.com', 'hash011', 'customer'),
+(12, 'Benjamin', 'Lopez', 'benjamin.lopez@example.com', 'hash012', 'customer'),
+(13, 'Harper', 'Gonzalez', 'harper.gonzalez@example.com', 'hash013', 'customer'),
+(14, 'Elijah', 'Robinson', 'elijah.robinson@example.com', 'hash014', 'customer'),
+(15, 'Charlotte', 'Perez', 'charlotte.perez@example.com', 'hash015', 'customer');
 
 -- Products
 INSERT INTO products (id, name, description, price, image_url) VALUES
