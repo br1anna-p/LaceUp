@@ -1,12 +1,12 @@
 document.getElementById("signupForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const res = await fetch("/api/signup", {
+  const res = await fetch("/api/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      fname: document.getElementById("fname").value,
-      lname: document.getElementById("lname").value,
+      F_name: document.getElementById("fname").value,
+      L_name: document.getElementById("lname").value,
       email: document.getElementById("email").value,
       password: document.getElementById("password").value
     })
