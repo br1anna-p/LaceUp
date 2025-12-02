@@ -3,18 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <title>Checkout</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .checkout-box {
+      width: 90%;
+      max-width: 500px;
+      margin: 2rem auto;
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+    .checkout-box h2 {
+      margin-bottom: 1rem;
+    }
+    .btn-place-order {
+      margin-top: 1rem;
+      padding: 12px;
+      background: #222;
+      color: #fff;
+      border: none;
+      width: 100%;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
 
-<a href="/cart.html" class="back-home">← Back to Cart</a>
+  <div class="checkout-box">
+    <h2>Checkout Summary</h2>
 
-<h1>Checkout</h1>
+    <div id="checkout-items"></div>
 
-<div id="checkout-summary"></div>
+    <p><strong>Subtotal:</strong> $<span id="checkout-subtotal">0.00</span></p>
+    <p><strong>Discounts:</strong> <span id="checkout-discounts">None</span></p>
+    <p><strong>Final Total:</strong> $<span id="checkout-total">0.00</span></p>
 
-<button id="place-order" class="back-home">Place Order</button>
+    <button class="btn-place-order" id="place-order-btn">Place Order</button>
+  </div>
 
-<script src="checkout.js"></script>
+  <script src="checkout.js"></script>
 </body>
 </html>
