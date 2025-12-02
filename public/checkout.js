@@ -2,6 +2,23 @@
 // USER + CART + DISCOUNT SETUP
 // ===============================
 const user = JSON.parse(localStorage.getItem("user"));
+// ===============================
+// AUTO-FILL CHECKOUT IF LOGGED IN
+// ===============================
+function autofillUser() {
+  if (!user) return; // guest user, do nothing
+
+  const firstName = document.getElementById("first-name");
+  const lastName = document.getElementById("last-name");
+  const emailField = document.getElementById("email");
+
+  if (firstName) firstName.value = user.F_name || "";
+  if (lastName) lastName.value = user.L_name || "";
+  if (emailField) emailField.value = user.email || "";
+}
+
+autofillUser();
+
 
 let cartKey = "cart_guest";
 let discountKey = "discounts_guest";
@@ -128,17 +145,36 @@ document.querySelectorAll('input[name="shipping-method"]').forEach(radio => {
 // PLACE ORDER BUTTON
 // ===============================
 document.getElementById("place-order-btn").addEventListener("click", () => {
-  if (cart.length === 0) {
-    alert("Your cart is empty!");
-    return;
+  const errorMsg = document.getElementById("checkout-error");
+
+  // Collect fields you want to validate
+  const requiredFields = [
+    document.getElementById("first-name"),
+    document.getElementById("last-name"),
+    document.getElementById("address"),
+    document.getElementById("city"),
+    document.getElementById("state"),
+    document.getElementById("zip"),
+    document.getElementById("card-number"),
+    document.getElementById("card-exp"),
+    document.getElementById("card-cvv")
+  ];
+
+  // Check for any empty fields
+  for (let field of requiredFields) {
+    if (!field || field.value.trim() === "") {
+      errorMsg.textContent = "Please fill out all required fields.";
+      errorMsg.style.display = "block";
+      return; // stop the checkout
+    }
   }
 
-  // Later we can validate shipping fields here
+  // If everything is filled → remove error
+  errorMsg.style.display = "none";
 
-  // Clear user cart & discounts
+  // Now continue with placing the order
   localStorage.removeItem(cartKey);
   localStorage.removeItem(discountKey);
 
-  // Redirect to confirmation page (we'll fix the route later)
   window.location = "/order-confirmation.html";
 });
