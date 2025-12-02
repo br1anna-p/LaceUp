@@ -10,13 +10,11 @@
 
   <!-- Navbar -->
   <nav class="navbar">
-    <div class="logo">LaceUp</div>
-    <ul class="nav-links">
-      <li><a href="/login.html">Login</a></li>
-      <li><a href="/signup.html">Sign Up</a></li>
-      <li><a href="/cart.html">Cart 🛒</a></li>
-    </ul>
-  </nav>
+  <div class="logo">LaceUp</div>
+  <ul class="nav-links" id="nav-links">
+  </ul>
+</nav>
+
 
   <!-- Header -->
   <header>
@@ -54,13 +52,36 @@
 <script>
   const user = JSON.parse(localStorage.getItem("user"));
   const header = document.getElementById("welcome-header");
+  const nav = document.getElementById("nav-links");
 
+  // Update welcome message
   if (user) {
     header.textContent = `Welcome to LaceUp, ${user.F_name}`;
   } else {
     header.textContent = "Welcome to LaceUp";
   }
+
+  // Update navbar
+  if (user) {
+    nav.innerHTML = `
+      <li><a href="/cart.html">Cart 🛒</a></li>
+      <li><button id="logout-btn" class="logout-btn">Logout</button></li>
+    `;
+  } else {
+    nav.innerHTML = `
+      <li><a href="/login.html">Login</a></li>
+      <li><a href="/signup.html">Sign Up</a></li>
+      <li><a href="/cart.html">Cart 🛒</a></li>
+    `;
+  }
+
+  // Logout button functionality
+  document.getElementById("logout-btn")?.addEventListener("click", () => {
+    localStorage.removeItem("user");
+    window.location = "/";
+  });
 </script>
+
 
   <script src="script.js"></script>
 </body>
