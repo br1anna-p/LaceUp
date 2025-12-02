@@ -1,5 +1,5 @@
 // ===============================
-// USER + CART + DISCOUNT SETUP
+// USER + CART KEYS
 // ===============================
 const user = JSON.parse(localStorage.getItem("user"));
 
@@ -14,14 +14,16 @@ if (user) {
 let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
 let appliedDiscounts = JSON.parse(localStorage.getItem(discountKey)) || [];
 
-// Elements
+// ===============================
+// ELEMENTS
+// ===============================
 const itemsEl = document.getElementById("checkout-items");
 const subtotalEl = document.getElementById("checkout-subtotal");
 const discountsEl = document.getElementById("checkout-discounts");
 const totalEl = document.getElementById("checkout-total");
 
 // ===============================
-// DISPLAY CHECKOUT ITEMS
+// RENDER CHECKOUT SUMMARY
 // ===============================
 function renderCheckout() {
   if (cart.length === 0) {
@@ -33,22 +35,33 @@ function renderCheckout() {
   }
 
   let subtotal = 0;
-
   itemsEl.innerHTML = "";
+
+  // Build the item list with picture + info
   cart.forEach(item => {
     subtotal += item.price;
 
     itemsEl.innerHTML += `
-      <p>${item.name} — $${item.price.toFixed(2)}</p>
+      <div class="summary-item">
+        <img src="${item.image}" alt="${item.name}">
+        <div class="summary-details">
+          <strong>${item.name}</strong><br>
+          Size: ${item.sizeId}<br>
+          Price: $${item.price.toFixed(2)}
+        </div>
+      </div>
     `;
   });
 
   subtotalEl.textContent = subtotal.toFixed(2);
 
-  // Apply discounts
+  // ==========================
+  // APPLY DISCOUNTS
+  // ==========================
   let finalTotal = subtotal;
   let discountText = [];
 
+  // Percentage discount (max 1)
   const percent = appliedDiscounts.find(d => d.type === "percentage");
   if (percent) {
     const amount = finalTotal * (percent.amount / 100);
@@ -56,6 +69,7 @@ function renderCheckout() {
     discountText.push(`${percent.code} (-${percent.amount}%)`);
   }
 
+  // Fixed discounts (max 2)
   appliedDiscounts
     .filter(d => d.type === "fixed")
     .slice(0, 2)
@@ -64,11 +78,7 @@ function renderCheckout() {
       discountText.push(`${d.code} (-$${d.amount})`);
     });
 
-  if (discountText.length === 0) {
-    discountsEl.textContent = "None";
-  } else {
-    discountsEl.textContent = discountText.join(", ");
-  }
+  discountsEl.textContent = discountText.length ? discountText.join(", ") : "None";
 
   if (finalTotal < 0) finalTotal = 0;
   totalEl.textContent = finalTotal.toFixed(2);
@@ -77,11 +87,15 @@ function renderCheckout() {
 renderCheckout();
 
 // ===============================
-// PLACE ORDER
+// PLACE ORDER BUTTON
 // ===============================
 document.getElementById("place-order-btn").addEventListener("click", () => {
+  if (cart.length === 0) {
+    alert("Your cart is empty!");
+    return;
+  }
 
-  // Clear cart + discounts
+  // Clear user cart & discounts
   localStorage.removeItem(cartKey);
   localStorage.removeItem(discountKey);
 
