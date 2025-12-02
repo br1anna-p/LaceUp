@@ -4,12 +4,22 @@
 const cartItemsEl = document.getElementById("cart-items");
 const cartTotalEl = document.getElementById("cart-total");
 
-const cart = JSON.parse(localStorage.getItem("cart")) || [];
+const user = JSON.parse(localStorage.getItem("user"));
+
+let cartKey = "cart_guest"; // default for not logged in
+
+if (user) {
+  cartKey = `cart_${user.id}`;  // unique cart per user
+}
+
+let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+
 let originalTotal = 0;
 
 // Load saved discounts
 let appliedDiscounts =
   JSON.parse(localStorage.getItem("appliedDiscounts")) || [];
+
 
 function saveDiscounts() {
   localStorage.setItem("appliedDiscounts", JSON.stringify(appliedDiscounts));
@@ -50,7 +60,7 @@ if (cart.length === 0) {
     btn.addEventListener("click", (e) => {
       const index = e.target.dataset.index;
       cart.splice(index, 1);
-      localStorage.setItem("cart", JSON.stringify(cart));
+      localStorage.setItem(cartKey, JSON.stringify(cart));
       location.reload();
     });
   });
