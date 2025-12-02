@@ -15,9 +15,9 @@ function saveDiscounts() {
   localStorage.setItem("appliedDiscounts", JSON.stringify(appliedDiscounts));
 }
 
-// --------------------
+// =====================
 // DISPLAY CART
-// --------------------
+// =====================
 if (cart.length === 0) {
   cartItemsEl.innerHTML = "<p>Your cart is empty.</p>";
   cartTotalEl.textContent = "";
@@ -46,12 +46,10 @@ if (cart.length === 0) {
   originalTotal = total;
   cartTotalEl.textContent = `Total: $${total.toFixed(2)}`;
 
-  // remove buttons
   document.querySelectorAll(".remove-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const index = e.target.dataset.index;
       cart.splice(index, 1);
-
       localStorage.setItem("cart", JSON.stringify(cart));
       location.reload();
     });
@@ -59,10 +57,9 @@ if (cart.length === 0) {
 }
 
 // =====================
-// DISCOUNT INPUT FORMAT
+// DISCOUNT INPUT (UPPERCASE)
 // =====================
 const discountInput = document.getElementById("discount-code");
-
 if (discountInput) {
   discountInput.addEventListener("input", () => {
     discountInput.value = discountInput.value.toUpperCase();
@@ -70,7 +67,7 @@ if (discountInput) {
 }
 
 // =====================
-// APPLY DISCOUNT
+// APPLY DISCOUNT BTN
 // =====================
 document
   .getElementById("apply-discount-btn")
@@ -94,7 +91,7 @@ document
 
     try {
       const response = await fetch(`/api/discount/${code}`);
-      const data = await response.json();
+      const data = await res.json();
 
       if (!data.success) {
         msg.style.color = "red";
@@ -104,7 +101,7 @@ document
 
       const discount = data.discount;
 
-      // -------- RULES ----------
+      // RULES
       if (discount.type === "percentage") {
         if (appliedDiscounts.some((d) => d.type === "percentage")) {
           msg.style.color = "red";
@@ -130,6 +127,7 @@ document
       saveDiscounts();
 
       updateDisplayedTotal();
+      displayDiscountList();
 
       msg.style.color = "green";
       msg.textContent = `Discount applied: ${discount.code}`;
@@ -140,7 +138,7 @@ document
   });
 
 // =====================
-// TOTAL CALCULATION
+// CALCULATE FINAL TOTAL
 // =====================
 function calculateFinalTotal() {
   let total = originalTotal;
@@ -162,3 +160,38 @@ function updateDisplayedTotal() {
   const finalTotal = calculateFinalTotal();
   cartTotalEl.textContent = `Total: $${finalTotal.toFixed(2)}`;
 }
+
+// =====================
+// DISPLAY + REMOVE DISCOUNTS
+// =====================
+const discountListEl = document.getElementById("applied-discount-list");
+
+function displayDiscountList() {
+  if (!discountListEl) return;
+
+  discountListEl.innerHTML = "";
+
+  appliedDiscounts.forEach((d, index) => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <strong>${d.code}</strong> — ${
+      d.type === "percentage" ? d.amount + "%" : "$" + d.amount
+    }
+      <button class="remove-discount-btn" data-index="${index}">Remove</button>
+    `;
+    discountListEl.appendChild(li);
+  });
+
+  document.querySelectorAll(".remove-discount-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const index = e.target.dataset.index;
+      appliedDiscounts.splice(index, 1);
+      saveDiscounts();
+      updateDisplayedTotal();
+      displayDiscountList();
+    });
+  });
+}
+
+displayDiscountList();
+updateDisplayedTotal();
