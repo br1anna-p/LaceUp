@@ -2,24 +2,88 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Checkout</title>
+  <title>LaceUp – Checkout</title>
   <link rel="stylesheet" href="style.css">
+
   <style>
-    .checkout-box {
-      width: 90%;
-      max-width: 500px;
+    body {
+      background: #f5f5f5;
+      font-family: Arial, sans-serif;
+    }
+
+    .checkout-container {
+      max-width: 1200px;
       margin: 2rem auto;
-      background: white;
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 2rem;
+    }
+
+    .section-box {
+      background: #fff;
       padding: 1.5rem;
       border-radius: 8px;
       border: 1px solid #ddd;
+      margin-bottom: 1.5rem;
     }
-    .checkout-box h2 {
+
+    h2.section-title {
       margin-bottom: 1rem;
+      font-size: 20px;
+      color: #222;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 5px;
     }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .order-summary {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      height: fit-content;
+    }
+
+    .summary-item {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 1rem;
+    }
+
+    .summary-item img {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+    }
+
+    .summary-details {
+      font-size: 14px;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.5rem;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
     .btn-place-order {
       margin-top: 1rem;
-      padding: 12px;
+      padding: 14px;
       background: #222;
       color: #fff;
       border: none;
@@ -29,22 +93,111 @@
       font-size: 16px;
       font-weight: bold;
     }
+
+    .btn-place-order:hover {
+      background: #444;
+    }
+
+    .payment-icons img {
+      height: 26px;
+      margin-right: 6px;
+      opacity: 0.8;
+    }
   </style>
 </head>
 <body>
 
-  <div class="checkout-box">
-    <h2>Checkout Summary</h2>
+<div class="checkout-container">
+
+  <!-- LEFT SIDE — FORMS -->
+  <div>
+
+    <!-- SHIPPING -->
+    <div class="section-box">
+      <h2 class="section-title">1. Shipping Address</h2>
+      <input type="text" id="ship-first" placeholder="First Name *">
+      <input type="text" id="ship-last" placeholder="Last Name *">
+      <input type="text" id="ship-address" placeholder="Street Address *">
+      <input type="text" id="ship-address2" placeholder="Address Line 2 (optional)">
+      <input type="text" id="ship-city" placeholder="City *">
+      <input type="text" id="ship-state" placeholder="State *">
+      <input type="text" id="ship-zip" placeholder="ZIP Code *">
+      <input type="email" id="ship-email" placeholder="Email *">
+      <input type="text" id="ship-phone" placeholder="Phone Number *">
+    </div>
+
+    <!-- BILLING -->
+    <div class="section-box">
+      <h2 class="section-title">2. Billing Address</h2>
+      <label>
+        <input type="checkbox" id="same-as-shipping" checked>
+        Use Shipping Address for Billing
+      </label>
+    </div>
+
+    <!-- SHIPPING METHOD -->
+    <div class="section-box">
+      <h2 class="section-title">3. Shipping Method</h2>
+      <label>
+        <input type="radio" name="shipping-method" value="free" checked>
+        Standard Shipping – <strong>FREE</strong>
+      </label><br>
+      <label>
+        <input type="radio" name="shipping-method" value="express">
+        Express Shipping – <strong>$14.99</strong>
+      </label>
+    </div>
+
+    <!-- PAYMENT -->
+    <div class="section-box">
+      <h2 class="section-title">4. Payment Method</h2>
+
+      <div class="payment-icons">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Paypal_2014_logo.png">
+      </div>
+
+      <input type="text" placeholder="Name on Card">
+      <input type="text" placeholder="Card Number">
+      <input type="text" placeholder="Expiration (MM/YY)">
+      <input type="text" placeholder="Security Code (CVV)">
+    </div>
+
+    <!-- ORDER REVIEW -->
+    <div class="section-box">
+      <h2 class="section-title">5. Order Review</h2>
+      <p>Your items are listed on the right.</p>
+      <button class="btn-place-order" id="place-order-btn">Place My Order</button>
+    </div>
+
+  </div>
+
+  <!-- RIGHT SIDE — ORDER SUMMARY -->
+  <div class="order-summary">
+    <h2>Your Order</h2>
 
     <div id="checkout-items"></div>
 
-    <p><strong>Subtotal:</strong> $<span id="checkout-subtotal">0.00</span></p>
-    <p><strong>Discounts:</strong> <span id="checkout-discounts">None</span></p>
-    <p><strong>Final Total:</strong> $<span id="checkout-total">0.00</span></p>
+    <div class="total-row">
+      <span>Subtotal:</span>
+      <span id="checkout-subtotal">$0.00</span>
+    </div>
 
-    <button class="btn-place-order" id="place-order-btn">Place Order</button>
+    <div class="total-row">
+      <span>Discounts:</span>
+      <span id="checkout-discounts">None</span>
+    </div>
+
+    <div class="total-row">
+      <span>Total:</span>
+      <span id="checkout-total">$0.00</span>
+    </div>
+
   </div>
 
-  <script src="checkout.js"></script>
+</div>
+
+<script src="checkout.js"></script>
 </body>
 </html>
