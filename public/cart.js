@@ -37,6 +37,7 @@ function saveDiscounts() {
 if (cart.length === 0) {
   cartItemsEl.innerHTML = "<p>Your cart is empty.</p>";
   cartTotalEl.textContent = "";
+  document.getElementById("checkout-btn")?.remove();  // hide checkout button
 } else {
   let total = 0;
 
