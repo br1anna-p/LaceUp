@@ -162,6 +162,53 @@ app.post('/api/login', (req, res) => {
   });
 });
 
+// =====================
+// PLACE ORDER
+// =====================
+app.post("/api/place-order", (req, res) => {
+  const { userId, items, total, shippingMethod, address } = req.body;
+
+  if (!items || items.length === 0) {
+    return res.status(400).json({ success: false, message: "Cart is empty" });
+  }
+
+  // Insert order into `orders` table
+  const orderQuery = `
+    INSERT INTO orders (user_id, total_amount, shipping_method, address)
+    VALUES (?, ?, ?, ?)
+  `;
+
+  db.query(
+    orderQuery,
+    [userId || null, total, shippingMethod, address],
+    (err, result) => {
+      if (err) return res.status(500).json({ success: false });
+
+      const orderId = result.insertId;
+
+      // Insert each item into `order_items`
+      const itemQuery = `
+        INSERT INTO order_items (order_id, product_id, size_id, price)
+        VALUES ?
+      `;
+
+      const formattedItems = items.map(i => [
+        orderId,
+        i.id,
+        i.sizeId,
+        i.price
+      ]);
+
+      db.query(itemQuery, [formattedItems], (err2) => {
+        if (err2) return res.status(500).json({ success: false });
+
+        res.json({ success: true, orderId });
+      });
+    }
+  );
+});
+
+
 
 // =====================
 // 404 ROUTE
