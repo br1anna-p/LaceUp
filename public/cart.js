@@ -91,7 +91,7 @@ document
 
     try {
       const response = await fetch(`/api/discount/${code}`);
-      const data = await res.json();
+      const data = await response.json();
 
       if (!data.success) {
         msg.style.color = "red";
