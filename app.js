@@ -231,6 +231,26 @@ app.delete("/api/products/:id", (req, res) => {
 });
 
 
+// Create new product
+app.post("/api/products", (req, res) => {
+  const { name, description, image_url, price, quantity } = req.body;
+
+  if (!name || !description || !image_url || !price || !quantity) {
+    return res.json({ success: false, message: "Missing fields" });
+  }
+
+  const query = `
+    INSERT INTO products (name, description, image_url, price, quantity)
+    VALUES (?, ?, ?, ?, ?)
+  `;
+
+  db.query(query, [name, description, image_url, price, quantity], (err, result) => {
+    if (err) return res.json({ success: false, message: "DB insert failed" });
+    res.json({ success: true, productId: result.insertId });
+  });
+});
+
+
 // =====================
 // 404 ROUTE
 // =====================
