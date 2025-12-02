@@ -43,7 +43,9 @@ async function loadProduct() {
   }
 }
 
-// Add to Cart functionality
+// ===========================
+// ADD TO CART (FIXED VERSION)
+// ===========================
 addToCartBtn.addEventListener('click', () => {
   const selectedSizeId = sizeSelect.value;
   if (!selectedSizeId) {
@@ -51,8 +53,13 @@ addToCartBtn.addEventListener('click', () => {
     return;
   }
 
-  // Get existing cart from localStorage or empty array
-  let cart = JSON.parse(localStorage.getItem('cart')) || [];
+  // ✔ Determine correct cart key
+  const user = JSON.parse(localStorage.getItem("user"));
+  let cartKey = "cart_guest";
+  if (user) cartKey = `cart_${user.id}`;
+
+  // ✔ Load the correct cart
+  let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
 
   // Add the product
   cart.push({
@@ -63,18 +70,14 @@ addToCartBtn.addEventListener('click', () => {
     image: imgEl.src
   });
 
-  // Save back to localStorage
-  localStorage.setItem('cart', JSON.stringify(cart));
-
-    // Save back to localStorage
-  localStorage.setItem('cart', JSON.stringify(cart));
+  // ✔ Save the correct cart
+  localStorage.setItem(cartKey, JSON.stringify(cart));
 
   // -------------------------
   // Inline "added to cart" notice with View Cart link
   // -------------------------
   const notice = document.getElementById('cart-notice');
 
-  // Fill the notice with message, a View Cart link, and a close button
   notice.innerHTML = `
     <div class="notice-inner" role="status" style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:6px;background:#fff;border:1px solid #ddd;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
       <span style="font-weight:600">${nameEl.textContent} added to cart.</span>
@@ -83,10 +86,8 @@ addToCartBtn.addEventListener('click', () => {
     </div>
   `;
 
-  // Show the notice
   notice.style.display = 'block';
 
-  // Close handler
   const closeBtn = notice.querySelector('.close-notice');
   const closeNotice = () => {
     notice.style.display = 'none';
@@ -94,7 +95,6 @@ addToCartBtn.addEventListener('click', () => {
   };
   if (closeBtn) closeBtn.addEventListener('click', closeNotice);
 
-  // Auto-hide after 6 seconds
   setTimeout(closeNotice, 6000);
 });
 
