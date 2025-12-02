@@ -43,7 +43,8 @@ const subtotalEl = document.getElementById("checkout-subtotal");
 const discountsEl = document.getElementById("checkout-discounts");
 const shippingEl = document.getElementById("checkout-shipping");
 const taxEl = document.getElementById("checkout-tax");
-const totalEl = document.getElementById("checkout-total");
+const totalEl = document.getElementById("checkout-total");           // right box
+const totalBottomEl = document.getElementById("checkout-total-bottom"); // step 5 text
 
 // ===============================
 // HELPER: get selected shipping
@@ -131,7 +132,11 @@ function renderCheckout() {
 
   // ---------- FINAL TOTAL ----------
   const finalTotal = discounted + shippingCost + taxAmount;
-  totalEl.textContent = finalTotal.toFixed(2);
+const finalText = finalTotal.toFixed(2);
+
+totalEl.textContent = finalText;           // right box
+if (totalBottomEl) totalBottomEl.textContent = finalText;  // step 5
+
 }
 
 renderCheckout();
