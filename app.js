@@ -97,26 +97,28 @@ app.get('/api/discount/:code', (req, res) => {
 app.post('/api/register', (req, res) => {
   const { F_name, L_name, email, password } = req.body;
 
-  if (!F_name || !L_name || !email || !password)
-    return res.status(400).json({ error: "Please fill all fields" });
+  if (!F_name || !L_name || !email || !password) {
+    return res.json({ success: false, error: "Please fill all fields" });
+  }
 
-  // check if user exists
-  db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
-    if (results.length > 0)
-      return res.status(400).json({ error: "Email already registered" });
+  db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
+    if (err) return res.json({ success: false, error: "Database error" });
 
-    // store password as plaintext (matches your login)
+    if (results.length > 0) {
+      return res.json({ success: false, error: "Email already registered" });
+    }
+
+    // NO hashing since your DB stores plain passwords
     const insertQuery = `
       INSERT INTO users (F_name, L_name, email, password_hash, role)
-      VALUES (?, ?, ?, ?, "customer")
+      VALUES (?, ?, ?, ?, 'customer')
     `;
 
     db.query(insertQuery, [F_name, L_name, email, password], (err, result) => {
-      if (err) return res.status(500).json({ error: "Error creating user" });
+      if (err) return res.json({ success: false, error: "Error creating user" });
 
       res.json({
         success: true,
-        message: "Account created!",
         userId: result.insertId
       });
     });
