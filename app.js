@@ -231,13 +231,17 @@ app.delete("/api/products/:id", (req, res) => {
 });
 
 
-// Create new product
+// Create new product (EMERGENCY SAFE MODE)
 app.post("/api/products", (req, res) => {
-  const { name, description, image_url, price, quantity } = req.body;
+  let { name, description, image_url, price } = req.body;
 
-  if (!name || !image_url || !price) {
-    return res.json({ success: false, message: "Missing fields" });
-  }
+  // Force fallback values to avoid DB errors
+  if (!name) name = "Unnamed Product";
+  if (!description) description = "No description provided";
+  if (!image_url) image_url = "https://via.placeholder.com/300";
+  if (!price) price = 0;
+
+  const quantity = 0; // DO NOT USE — sizes will manage quantity
 
   const query = `
     INSERT INTO products (name, description, image_url, price, quantity)
@@ -245,32 +249,15 @@ app.post("/api/products", (req, res) => {
   `;
 
   db.query(query, [name, description, image_url, price, quantity], (err, result) => {
-    if (err) return res.json({ success: false, message: "DB insert failed" });
+    if (err) {
+      console.log("PRODUCT INSERT ERROR:", err);
+      return res.json({ success: false, message: "Product insert failed (DB error)" });
+    }
+
     res.json({ success: true, productId: result.insertId });
   });
 });
-// =====================
-// ADD SIZE TO PRODUCT
-// =====================
-app.post("/api/product-sizes", (req, res) => {
-  const { product_id, size, quantity } = req.body;
 
-  if (!product_id || !size || !quantity) {
-    return res.json({ success: false, message: "Missing fields" });
-  }
-
-  const sql = `
-    INSERT INTO product_sizes (product_id, size, quantity)
-    VALUES (?, ?, ?)
-  `;
-
-  db.query(sql, [product_id, size, quantity], (err) => {
-    if (err) {
-      return res.json({ success: false, message: "Error adding size" });
-    }
-    res.json({ success: true });
-  });
-});
 
 
 
