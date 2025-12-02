@@ -16,13 +16,19 @@ let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
 
 let originalTotal = 0;
 
-// Load saved discounts
-let appliedDiscounts =
-  JSON.parse(localStorage.getItem("appliedDiscounts")) || [];
+// -----------------------------
+// DISCOUNT STORAGE PER USER
+// -----------------------------
+let discountKey = "discounts_guest";
 
+if (user) {
+  discountKey = `discounts_${user.id}`;
+}
+
+let appliedDiscounts = JSON.parse(localStorage.getItem(discountKey)) || [];
 
 function saveDiscounts() {
-  localStorage.setItem("appliedDiscounts", JSON.stringify(appliedDiscounts));
+  localStorage.setItem(discountKey, JSON.stringify(appliedDiscounts));
 }
 
 // =====================
