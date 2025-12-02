@@ -200,9 +200,9 @@ app.get("/api/discounts", (req, res) => {
 // Create a new discount code
 app.post("/api/discounts", (req, res) => {
   const { code, amount, type } = req.body;
-
-  if (!code || !amount || !type)
+  if (!code || !amount || !type) {
     return res.json({ success: false, message: "Missing fields" });
+  }
 
   db.query(
     "INSERT INTO discounts (code, amount, type, active) VALUES (?, ?, ?, 1)",
@@ -230,42 +230,45 @@ app.delete("/api/products/:id", (req, res) => {
   });
 });
 
-
-// Create new product (EMERGENCY SAFE MODE)
+// Create new product
 app.post("/api/products", (req, res) => {
-  let { name, description, image_url, price } = req.body;
+  const { name, description, image_url, price, quantity } = req.body;
 
-  // Force fallback values to avoid DB errors
-  if (!name) name = "Unnamed Product";
-  if (!description) description = "No description provided";
-  if (!image_url) image_url = "https://via.placeholder.com/300";
-  if (!price) price = 0;
+  if (!name || !description || !image_url || !price || !quantity) {
+    return res.json({ success: false, message: "Missing fields" });
+  }
 
-  const quantity = 0; // DO NOT USE — sizes will manage quantity
-
-  const query = `
-    INSERT INTO products (name, description, image_url, price, quantity)
-    VALUES (?, ?, ?, ?, ?)
-  `;
-
+  const query = "INSERT INTO products (name, description, image_url, price, quantity) VALUES (?, ?, ?, ?, ?)";
   db.query(query, [name, description, image_url, price, quantity], (err, result) => {
-    if (err) {
-      console.log("PRODUCT INSERT ERROR:", err);
-      return res.json({ success: false, message: "Product insert failed (DB error)" });
-    }
-
+    if (err) return res.json({ success: false, message: "DB insert failed" });
     res.json({ success: true, productId: result.insertId });
   });
 });
 
+// =====================
+// ADD SIZE TO PRODUCT
+// =====================
+app.post("/api/product-sizes", (req, res) => {
+  const { product_id, size, quantity } = req.body;
 
+  if (!product_id || !size || !quantity) {
+    return res.json({ success: false, message: "Missing fields" });
+  }
 
+  const sql = "INSERT INTO product_sizes (product_id, size, quantity) VALUES (?, ?, ?)";
+  db.query(sql, [product_id, size, quantity], (err) => {
+    if (err) {
+      return res.json({ success: false, message: "Error adding size" });
+    }
+    res.json({ success: true });
+  });
+});
 
 // =====================
 // 404 ROUTE
 // =====================
 app.use((req, res) => {
-  res.status(404).send('Route not found');
+  res.status(404).send("Route not found");
 });
 
 // =====================
