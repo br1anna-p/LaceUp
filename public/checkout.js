@@ -1,62 +1,90 @@
-const summaryEl = document.getElementById('checkout-summary');
-const placeOrderBtn = document.getElementById('place-order');
+// ===============================
+// USER + CART + DISCOUNT SETUP
+// ===============================
+const user = JSON.parse(localStorage.getItem("user"));
 
-async function loadSummary() {
-  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  
+let cartKey = "cart_guest";
+let discountKey = "discounts_guest";
+
+if (user) {
+  cartKey = `cart_${user.id}`;
+  discountKey = `discounts_${user.id}`;
+}
+
+let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+let appliedDiscounts = JSON.parse(localStorage.getItem(discountKey)) || [];
+
+// Elements
+const itemsEl = document.getElementById("checkout-items");
+const subtotalEl = document.getElementById("checkout-subtotal");
+const discountsEl = document.getElementById("checkout-discounts");
+const totalEl = document.getElementById("checkout-total");
+
+// ===============================
+// DISPLAY CHECKOUT ITEMS
+// ===============================
+function renderCheckout() {
   if (cart.length === 0) {
-    summaryEl.innerHTML = '<p>Your cart is empty.</p>';
-    placeOrderBtn.style.display = 'none';
+    itemsEl.innerHTML = "<p>Your cart is empty.</p>";
+    subtotalEl.textContent = "0.00";
+    totalEl.textContent = "0.00";
+    discountsEl.textContent = "None";
     return;
   }
 
   let subtotal = 0;
-  let html = '<ul>';
 
-  for (let item of cart) {
-    const res = await fetch(`/api/products/${item.id}`);
-    const product = await res.json();
-    subtotal += Number(product.price);
-    html += `<li>${product.name} - $${product.price.toFixed(2)}</li>`;
-  }
+  itemsEl.innerHTML = "";
+  cart.forEach(item => {
+    subtotal += item.price;
 
-  html += '</ul>';
-  html += `<p>Subtotal: $${subtotal.toFixed(2)}</p>`;
-  html += `<p>Tax: $${(subtotal * 0.0825).toFixed(2)}</p>`;
-  html += `<p><strong>Total: $${(subtotal * 1.0825).toFixed(2)}</strong></p>`;
-
-  summaryEl.innerHTML = html;
-}
-
-placeOrderBtn.addEventListener('click', async () => {
-  const token = localStorage.getItem('token'); // Optional auth check
-
-  if (!token) {
-    alert("Login required.");
-    window.location.href = "/login.html";
-    return;
-  }
-
-  // Example POST request to create order (backend needs /api/orders route)
-  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  const res = await fetch('/api/orders', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token
-    },
-    body: JSON.stringify({ items: cart })
+    itemsEl.innerHTML += `
+      <p>${item.name} — $${item.price.toFixed(2)}</p>
+    `;
   });
 
-  const data = await res.json();
+  subtotalEl.textContent = subtotal.toFixed(2);
 
-  if (data.success) {
-    alert("Order placed!");
-    localStorage.removeItem('cart');
-    window.location.href = '/';
-  } else {
-    alert(data.error || "Order failed.");
+  // Apply discounts
+  let finalTotal = subtotal;
+  let discountText = [];
+
+  const percent = appliedDiscounts.find(d => d.type === "percentage");
+  if (percent) {
+    const amount = finalTotal * (percent.amount / 100);
+    finalTotal -= amount;
+    discountText.push(`${percent.code} (-${percent.amount}%)`);
   }
-});
 
-loadSummary();
+  appliedDiscounts
+    .filter(d => d.type === "fixed")
+    .slice(0, 2)
+    .forEach(d => {
+      finalTotal -= d.amount;
+      discountText.push(`${d.code} (-$${d.amount})`);
+    });
+
+  if (discountText.length === 0) {
+    discountsEl.textContent = "None";
+  } else {
+    discountsEl.textContent = discountText.join(", ");
+  }
+
+  if (finalTotal < 0) finalTotal = 0;
+  totalEl.textContent = finalTotal.toFixed(2);
+}
+
+renderCheckout();
+
+// ===============================
+// PLACE ORDER
+// ===============================
+document.getElementById("place-order-btn").addEventListener("click", () => {
+
+  // Clear cart + discounts
+  localStorage.removeItem(cartKey);
+  localStorage.removeItem(discountKey);
+
+  // Redirect to confirmation page
+  window.location = "/order-confirmation.html";
+});
