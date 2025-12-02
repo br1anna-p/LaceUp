@@ -95,32 +95,34 @@ app.get('/api/discount/:code', (req, res) => {
 // USER REGISTRATION
 // =====================
 app.post('/api/register', (req, res) => {
-  const { F_name, L_name, email, password, role } = req.body;
+  const { F_name, L_name, email, password } = req.body;
 
   if (!F_name || !L_name || !email || !password)
-    return res.status(400).json({ error: 'Please fill all fields' });
+    return res.status(400).json({ error: "Please fill all fields" });
 
-  db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
-    if (err) return res.status(500).json({ error: 'Database error' });
+  // check if user exists
+  db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
     if (results.length > 0)
-      return res.status(400).json({ error: 'Email already registered' });
+      return res.status(400).json({ error: "Email already registered" });
 
-    const hashedPassword = bcrypt.hashSync(password, 10);
-
+    // store password as plaintext (matches your login)
     const insertQuery = `
       INSERT INTO users (F_name, L_name, email, password_hash, role)
-      VALUES (?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, "customer")
     `;
-    db.query(
-      insertQuery,
-      [F_name, L_name, email, hashedPassword, role || 'customer'],
-      (err, result) => {
-        if (err) return res.status(500).json({ error: 'Error creating user' });
-        res.json({ message: 'User registered successfully!', userId: result.insertId });
-      }
-    );
+
+    db.query(insertQuery, [F_name, L_name, email, password], (err, result) => {
+      if (err) return res.status(500).json({ error: "Error creating user" });
+
+      res.json({
+        success: true,
+        message: "Account created!",
+        userId: result.insertId
+      });
+    });
   });
 });
+
 
 // =====================
 // USER LOGIN
