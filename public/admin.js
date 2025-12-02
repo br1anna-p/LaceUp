@@ -60,6 +60,24 @@ async function loadDiscounts() {
     `;
   });
 }
+
+// ======================================================
+// ADD SIZE ROW BUTTON (THIS MUST BE OUTSIDE EVERYTHING)
+// ======================================================
+document.getElementById("add-size-btn").addEventListener("click", () => {
+  const container = document.getElementById("size-area");
+
+  container.innerHTML += `
+    <div class="size-row">
+      <input type="text" class="size-input" placeholder="Size (ex: 5, 6, 7)">
+      <input type="number" class="qty-input" placeholder="Quantity">
+    </div>
+  `;
+});
+
+// ==========================
+// ADD PRODUCT + SIZES
+// ==========================
 document.getElementById("add-product-btn").addEventListener("click", async () => {
   const name = document.getElementById("new-product-name").value.trim();
   const desc = document.getElementById("new-product-desc").value.trim();
@@ -74,6 +92,7 @@ document.getElementById("add-product-btn").addEventListener("click", async () =>
     return;
   }
 
+  // create product
   const res = await fetch("/api/products", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -89,15 +108,37 @@ document.getElementById("add-product-btn").addEventListener("click", async () =>
   const data = await res.json();
 
   if (data.success) {
+    // Add sizes
+    const sizeRows = document.querySelectorAll(".size-row");
+
+    for (const row of sizeRows) {
+      const size = row.querySelector(".size-input").value.trim();
+      const qty = row.querySelector(".qty-input").value.trim();
+
+      if (!size || !qty) continue;
+
+      await fetch("/api/product-sizes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          product_id: data.productId,
+          size,
+          quantity: qty
+        })
+      });
+    }
+
     msg.style.color = "green";
-    msg.textContent = "Product added!";
+    msg.textContent = "Product + sizes added!";
   } else {
     msg.style.color = "red";
     msg.textContent = "Failed to add product.";
   }
 });
 
-
+// ==========================
+// ADD DISCOUNT
+// ==========================
 document.getElementById("add-discount-btn").addEventListener("click", async () => {
   const code = document.getElementById("new-discount-code").value.trim();
   const amount = document.getElementById("new-discount-amount").value;
