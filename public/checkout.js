@@ -208,5 +208,5 @@ document.getElementById("place-order-btn").addEventListener("click", async () =>
   localStorage.setItem("last_order_id", data.orderId);
 
   // Go to confirmation
-  window.location = "/order-confirmation.html";
+  window.location = "/order.html";
 });
