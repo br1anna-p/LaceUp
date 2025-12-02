@@ -12,8 +12,9 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
 
   const data = await res.json();
 
-  if (data.token) {
-    localStorage.setItem("token", data.token);
+  if (res.ok) {
+    // Login successful
+    localStorage.setItem("user", JSON.stringify(data.user));
     window.location = "/";
   } else {
     alert("Invalid login");
