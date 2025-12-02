@@ -125,6 +125,7 @@ app.post('/api/register', (req, res) => {
 // =====================
 // USER LOGIN
 // =====================
+// USER LOGIN (plain text version)
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -132,7 +133,6 @@ app.post('/api/login', (req, res) => {
     return res.status(400).json({ error: "Please provide email and password" });
   }
 
-  // IMPORTANT: table name MUST be `users`
   db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
     if (err) return res.status(500).json({ error: "Database error" });
 
@@ -142,12 +142,12 @@ app.post('/api/login', (req, res) => {
 
     const user = results[0];
 
-    // SIMPLE password check (because your DB stores plain passwords)
+    // ✅ Plain text comparison since DB stores raw passwords
     if (password !== user.password_hash) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    // SUCCESS — respond with user info
+    // SUCCESS
     res.json({
       success: true,
       message: "Login successful!",
