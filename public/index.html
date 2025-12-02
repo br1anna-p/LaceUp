@@ -20,7 +20,8 @@
 
   <!-- Header -->
   <header>
-    <h1>Welcome to LaceUp</h1>
+    <h1 id="welcome-header">Welcome to LaceUp</h1>
+
     <p>Discover our featured sneakers below!</p>
   </header>
 
@@ -50,7 +51,17 @@
     
     <div id="products"></div>
   </section>
-  
+<script>
+  const user = JSON.parse(localStorage.getItem("user"));
+  const header = document.getElementById("welcome-header");
+
+  if (user) {
+    header.textContent = `Welcome to LaceUp, ${user.F_name}`;
+  } else {
+    header.textContent = "Welcome to LaceUp";
+  }
+</script>
+
   <script src="script.js"></script>
 </body>
 </html>
