@@ -65,6 +65,7 @@
   if (user) {
     nav.innerHTML = `
       <li><a href="/cart.html">Cart 🛒</a></li>
+      ${user.role === "admin" ? `<li><a href="/admin.html">Admin</a></li>` : ""}
       <li><button id="logout-btn" class="logout-btn">Logout</button></li>
     `;
   } else {
@@ -74,13 +75,6 @@
       <li><a href="/cart.html">Cart 🛒</a></li>
     `;
   }
-if (user) {
-  nav.innerHTML = `
-      <li><a href="/cart.html">Cart 🛒</a></li>
-      ${user.role === "admin" ? `<li><a href="/admin.html">Admin</a></li>` : ""}
-      <li><button id="logout-btn" class="logout-btn">Logout</button></li>
-  `;
-}
 
   // Logout button functionality
   document.getElementById("logout-btn")?.addEventListener("click", () => {
